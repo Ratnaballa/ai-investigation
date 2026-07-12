@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import {
   MdBubbleChart, MdAdd, MdDelete, MdRefresh, MdPerson,
-  MdLocationOn, MdFolder, MdGavel, MdWarning, MdGroup,
+  MdLocationOn, MdFolder, MdGavel, MdWarning, MdGroup, MdZoomIn, MdZoomOut,
 } from 'react-icons/md';
 import { graphService } from '../services/graphReportService';
 import { caseService } from '../services/caseService';
@@ -190,9 +190,9 @@ export default function GraphPage() {
       {error && <Alert type="error" message={error} onClose={() => setError('')} />}
 
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="text-lg font-bold text-white">Evidence Relationship Graph</h2>
+          <h2 className="text-lg font-semibold text-white">Evidence Relationship Graph</h2>
           <p className="text-sm text-slate-400">{nodes.length} nodes · {edges.length} relationships</p>
         </div>
         <div className="flex gap-2">
@@ -205,14 +205,18 @@ export default function GraphPage() {
         {/* Graph canvas */}
         <div className="lg:col-span-3">
           <Card className="p-0 overflow-hidden" style={{ height: '520px' }}>
-            <div className="p-3 border-b border-white/10 flex items-center justify-between">
-              <p className="text-xs text-slate-400">Drag nodes to rearrange · Click to select</p>
-              <div className="flex gap-1">
-                {NODE_TYPES.slice(0, 4).map((t) => (
-                  <span key={t.value} className="text-xs px-2 py-0.5 rounded-full" style={{ background: NODE_COLORS[t.value] + '30', color: NODE_COLORS[t.value] }}>
-                    {t.label}
-                  </span>
-                ))}
+            <div className="flex items-center justify-between border-b border-white/10 p-3">
+              <p className="text-xs text-slate-400">Drag nodes to rearrange · Click to inspect</p>
+              <div className="flex items-center gap-2">
+                <button className="rounded-lg border border-white/10 bg-slate-900/70 p-1.5 text-slate-300"><MdZoomIn size={15} /></button>
+                <button className="rounded-lg border border-white/10 bg-slate-900/70 p-1.5 text-slate-300"><MdZoomOut size={15} /></button>
+                <div className="flex gap-1">
+                  {NODE_TYPES.slice(0, 4).map((t) => (
+                    <span key={t.value} className="rounded-full px-2 py-0.5 text-[11px]" style={{ background: NODE_COLORS[t.value] + '30', color: NODE_COLORS[t.value] }}>
+                      {t.label}
+                    </span>
+                  ))}
+                </div>
               </div>
             </div>
             <div style={{ height: '460px' }}>

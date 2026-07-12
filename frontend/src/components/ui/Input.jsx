@@ -11,7 +11,7 @@ export default function Input({
       )}
       <div className="relative">
         {icon && (
-          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+          <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
             {icon}
           </span>
         )}
@@ -22,7 +22,7 @@ export default function Input({
           placeholder={placeholder}
           disabled={disabled}
           required={required}
-          className={`w-full input-glass rounded-xl px-4 py-2.5 text-sm ${icon ? 'pl-10' : ''} ${error ? 'border-red-500/60' : ''}`}
+          className={`w-full input-glass rounded-2xl px-4 py-2.75 text-sm ${icon ? 'pl-10' : ''} ${error ? 'border-red-500/60' : ''}`}
           {...rest}
         />
       </div>

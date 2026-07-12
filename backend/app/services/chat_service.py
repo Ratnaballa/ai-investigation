@@ -24,15 +24,26 @@ class ChatService:
         session_id = request.session_id or generate_session_id()
 
         # ── Ensure session exists ────────────────────────────────────────────
-        if not await self.session_repo.find_user_session(session_id, user_id):
+        session = await self.session_repo.find_user_session(session_id, user_id)
+        if not session:
+            title = await self._generate_title_from_query(request.message)
             await self.session_repo.insert_one({
                 "session_id": session_id,
                 "user_id": user_id,
-                "title": request.message[:50] + ("..." if len(request.message) > 50 else ""),
+                "title": title,
                 "language": request.language,
                 "message_count": 0,
                 "is_active": True,
+                "last_message": request.message,
             })
+        else:
+            # If session exists but has a placeholder title, update it
+            if session.get("title") == "New Investigation":
+                new_title = await self._generate_title_from_query(request.message)
+                await self.session_repo.collection.update_one(
+                    {"session_id": session_id},
+                    {"$set": {"title": new_title}}
+                )
 
         # ── Persist user message ─────────────────────────────────────────────
         await self.history_repo.insert_one({
@@ -79,7 +90,7 @@ class ChatService:
             "sources": structured.sources,
         })
 
-        await self.session_repo.increment_message_count(session_id)
+        await self.session_repo.update_session_activity(session_id, request.message)
         logger.info(
             f"[CHAT] Response sent | session={session_id} | user={user_id} "
             f"| sections={len(structured.recommended_bns_sections)}"
@@ -178,12 +189,14 @@ class ChatService:
 
         return ChatHistoryResponse(
             session=ChatSessionResponse(
-                id=str(session["_id"]),
+                id=session["session_id"],
                 title=session["title"],
                 language=session["language"],
                 message_count=session["message_count"],
                 is_active=session["is_active"],
                 created_at=session["created_at"],
+                updated_at=session.get("updated_at"),
+                last_message=session.get("last_message", "No messages yet"),
             ),
             messages=[
                 ChatMessageResponse(
@@ -205,12 +218,14 @@ class ChatService:
         return {
             "sessions": [
                 ChatSessionResponse(
-                    id=str(s["_id"]),
+                    id=s["session_id"],
                     title=s["title"],
                     language=s["language"],
                     message_count=s["message_count"],
                     is_active=s["is_active"],
                     created_at=s["created_at"],
+                    updated_at=s.get("updated_at"),
+                    last_message=s.get("last_message", "No messages yet"),
                 )
                 for s in sessions
             ],
@@ -223,3 +238,54 @@ class ChatService:
         if await self.session_repo.delete_user_session(session_id, user_id) == 0:
             raise NotFoundException("Chat session")
         await self.history_repo.delete_session_messages(session_id, user_id)
+
+    async def create_session(self, user_id: str) -> ChatSessionResponse:
+        session_id = generate_session_id()
+        session_doc = {
+            "session_id": session_id,
+            "user_id": user_id,
+            "title": "New Investigation",
+            "language": "en",
+            "message_count": 0,
+            "is_active": True,
+            "last_message": "No messages yet",
+        }
+        await self.session_repo.insert_one(session_doc)
+        return ChatSessionResponse(
+            id=session_id,
+            title=session_doc["title"],
+            language=session_doc["language"],
+            message_count=session_doc["message_count"],
+            is_active=session_doc["is_active"],
+            created_at=session_doc["created_at"],
+            updated_at=session_doc.get("updated_at"),
+            last_message=session_doc.get("last_message"),
+        )
+
+    async def _generate_title_from_query(self, query: str) -> str:
+        try:
+            messages = [
+                {
+                    "role": "system",
+                    "content": (
+                        "You are a legal assistant. Generate a very short, concise, professional "
+                        "investigation title (maximum 3-4 words) from the user's first query. "
+                        "Do not include quotes, markdown formatting, or any extra text. "
+                        "Examples: 'Mobile Phone Theft', 'Cyber Fraud', 'Domestic Violence', "
+                        "'Cheque Bounce', 'Murder Investigation'."
+                    )
+                },
+                {
+                    "role": "user",
+                    "content": f"Query: {query}"
+                }
+            ]
+            title = await self.grok.chat(messages, temperature=0.3, max_tokens=15)
+            cleaned_title = title.strip().replace('"', '').replace("'", "")
+            if len(cleaned_title) > 40:
+                cleaned_title = cleaned_title[:37] + "..."
+            return cleaned_title or "New Investigation"
+        except Exception as exc:
+            logger.warning(f"Failed to generate title using AI: {exc}")
+            # Fallback to simple truncation of the user's message
+            return query[:30] + ("..." if len(query) > 30 else "")

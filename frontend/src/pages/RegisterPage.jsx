@@ -47,25 +47,25 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen gradient-bg flex items-center justify-center p-4">
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-96 h-96 bg-blue-600/20 rounded-full blur-3xl" />
-        <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-purple-600/15 rounded-full blur-3xl" />
+    <div className="flex min-h-screen items-center justify-center bg-[radial-gradient(circle_at_top_right,_rgba(37,99,235,0.25),_transparent_28%),radial-gradient(circle_at_bottom_left,_rgba(6,182,212,0.16),_transparent_24%)] p-4">
+      <div className="pointer-events-none fixed inset-0 overflow-hidden">
+        <div className="absolute -right-40 -top-40 h-96 w-96 rounded-full bg-blue-600/20 blur-3xl" />
+        <div className="absolute -bottom-40 -left-40 h-96 w-96 rounded-full bg-purple-600/15 blur-3xl" />
       </div>
 
       <motion.div
         initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-lg relative z-10"
+        className="relative z-10 w-full max-w-lg"
       >
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-700 shadow-2xl mb-4">
+        <div className="mb-8 text-center">
+          <div className="mb-4 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-blue-700 shadow-2xl">
             <MdShield className="text-white" size={28} />
           </div>
-          <h1 className="text-2xl font-bold text-white">Create Account</h1>
-          <p className="text-slate-400 text-sm mt-1">AI Investigation Assistant Portal</p>
+          <h1 className="text-2xl font-semibold text-white">Create Account</h1>
+          <p className="mt-1 text-sm text-slate-400">AI Investigation Assistant Portal</p>
         </div>
 
-        <div className="glass rounded-2xl p-8 card-glow">
+        <div className="premium-card rounded-[28px] border border-white/10 p-8 shadow-2xl">
           {error && <div className="mb-4"><Alert type="error" message={error} onClose={() => setError('')} /></div>}
           {success && <div className="mb-4"><Alert type="success" message={success} /></div>}
 

@@ -25,17 +25,17 @@ export function Modal({ open, onClose, title, children, size = 'md' }) {
         <motion.div
           initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
           className="fixed inset-0 z-50 flex items-center justify-center p-4"
-          style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(4px)' }}
+          style={{ background: 'rgba(2, 6, 23, 0.76)', backdropFilter: 'blur(8px)' }}
           onClick={onClose}
         >
           <motion.div
-            initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }}
-            className={`glass-dark rounded-2xl w-full ${widths[size]} max-h-[90vh] overflow-y-auto`}
+            initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }}
+            className={`w-full ${widths[size]} max-h-[90vh] overflow-y-auto rounded-[24px] border border-white/10 bg-slate-950/90 shadow-2xl`}
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between p-6 border-b border-white/10">
+            <div className="flex items-center justify-between border-b border-white/10 p-6">
               <h2 className="text-lg font-semibold text-white">{title}</h2>
-              <button onClick={onClose} className="text-slate-400 hover:text-white transition-colors p-1 rounded-lg hover:bg-white/10">
+              <button onClick={onClose} className="rounded-lg p-1 text-slate-400 transition hover:bg-white/10 hover:text-white">
                 <MdClose size={20} />
               </button>
             </div>
@@ -55,7 +55,7 @@ export function Select({ label, value, onChange, options = [], className = '', r
         value={value}
         onChange={onChange}
         required={required}
-        className="input-glass rounded-xl px-4 py-2.5 text-sm appearance-none cursor-pointer"
+        className="cursor-pointer rounded-2xl border border-white/10 bg-slate-950/70 px-4 py-2.75 text-sm text-slate-100 outline-none appearance-none transition focus:border-blue-400/40"
       >
         {options.map((o) => (
           <option key={o.value} value={o.value} style={{ background: '#1e293b' }}>{o.label}</option>
@@ -75,7 +75,7 @@ export function Textarea({ label, value, onChange, placeholder, rows = 4, classN
         placeholder={placeholder}
         rows={rows}
         required={required}
-        className="input-glass rounded-xl px-4 py-2.5 text-sm resize-none"
+        className="resize-none rounded-2xl border border-white/10 bg-slate-950/70 px-4 py-2.75 text-sm text-slate-100 outline-none transition focus:border-blue-400/40"
       />
     </div>
   );
@@ -84,9 +84,9 @@ export function Textarea({ label, value, onChange, placeholder, rows = 4, classN
 export function EmptyState({ icon, title, description, action }) {
   return (
     <div className="flex flex-col items-center justify-center py-16 text-center">
-      <div className="text-5xl mb-4 opacity-40">{icon}</div>
-      <h3 className="text-lg font-semibold text-slate-300 mb-2">{title}</h3>
-      {description && <p className="text-sm text-slate-500 mb-6 max-w-sm">{description}</p>}
+      <div className="mb-4 rounded-2xl border border-white/10 bg-slate-900/70 p-4 text-5xl opacity-80">{icon}</div>
+      <h3 className="mb-2 text-lg font-semibold text-slate-200">{title}</h3>
+      {description && <p className="mb-6 max-w-sm text-sm text-slate-500">{description}</p>}
       {action}
     </div>
   );
@@ -105,18 +105,18 @@ export function PageLoader() {
 
 export function Alert({ type = 'error', message, onClose }) {
   const styles = {
-    error: 'bg-red-500/10 border-red-500/30 text-red-300',
-    success: 'bg-green-500/10 border-green-500/30 text-green-300',
-    info: 'bg-blue-500/10 border-blue-500/30 text-blue-300',
-    warning: 'bg-amber-500/10 border-amber-500/30 text-amber-300',
+    error: 'border-red-500/30 bg-red-500/10 text-red-300',
+    success: 'border-emerald-500/30 bg-emerald-500/10 text-emerald-300',
+    info: 'border-blue-500/30 bg-blue-500/10 text-blue-300',
+    warning: 'border-amber-500/30 bg-amber-500/10 text-amber-300',
   };
   return (
     <motion.div
       initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
-      className={`flex items-center justify-between gap-3 px-4 py-3 rounded-xl border text-sm ${styles[type]}`}
+      className={`flex items-center justify-between gap-3 rounded-2xl border px-4 py-3 text-sm ${styles[type]}`}
     >
       <span>{message}</span>
-      {onClose && <button onClick={onClose} className="opacity-70 hover:opacity-100"><MdClose size={16} /></button>}
+      {onClose && <button onClick={onClose} className="opacity-70 transition hover:opacity-100"><MdClose size={16} /></button>}
     </motion.div>
   );
 }

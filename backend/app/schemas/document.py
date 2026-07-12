@@ -45,6 +45,7 @@ class ReportResponse(BaseModel):
     summary: Optional[str] = None
     file_path: Optional[str] = None
     created_by: str
+    created_by_name: Optional[str] = None
     is_finalized: bool
     tags: List[str]
     created_at: datetime
@@ -56,6 +57,7 @@ class ReportResponse(BaseModel):
 class GenerateReportRequest(BaseModel):
     case_id: str
     report_type: ReportType
+    title: Optional[str] = None
     include_evidence: bool = True
     include_graph: bool = True
     include_legal_sections: bool = True

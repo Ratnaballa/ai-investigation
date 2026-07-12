@@ -32,36 +32,32 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen gradient-bg flex items-center justify-center p-4">
-      {/* Background orbs */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -left-40 w-96 h-96 bg-blue-600/20 rounded-full blur-3xl" />
-        <div className="absolute -bottom-40 -right-40 w-96 h-96 bg-purple-600/15 rounded-full blur-3xl" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-blue-900/10 rounded-full blur-3xl" />
+    <div className="flex min-h-screen items-center justify-center bg-[radial-gradient(circle_at_top_left,_rgba(37,99,235,0.25),_transparent_28%),radial-gradient(circle_at_bottom_right,_rgba(6,182,212,0.16),_transparent_24%)] p-4">
+      <div className="pointer-events-none fixed inset-0 overflow-hidden">
+        <div className="absolute -left-40 -top-40 h-96 w-96 rounded-full bg-blue-600/20 blur-3xl" />
+        <div className="absolute -bottom-40 -right-40 h-96 w-96 rounded-full bg-purple-600/15 blur-3xl" />
       </div>
 
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="w-full max-w-md relative z-10"
+        className="relative z-10 w-full max-w-md"
       >
-        {/* Header */}
-        <div className="text-center mb-8">
+        <div className="mb-8 text-center">
           <motion.div
             initial={{ scale: 0 }} animate={{ scale: 1 }}
             transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
-            className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-700 shadow-2xl mb-4"
+            className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-blue-700 shadow-2xl"
           >
             <MdShield className="text-white" size={32} />
           </motion.div>
-          <h1 className="text-2xl font-bold text-white">AI Investigation Assistant</h1>
-          <p className="text-slate-400 text-sm mt-1">Government Law Enforcement Portal</p>
+          <h1 className="text-2xl font-semibold text-white">AI Investigation Assistant</h1>
+          <p className="mt-1 text-sm text-slate-400">Government Law Enforcement Portal</p>
         </div>
 
-        {/* Card */}
-        <div className="glass rounded-2xl p-8 card-glow">
-          <h2 className="text-lg font-semibold text-white mb-6">Sign In to Your Account</h2>
+        <div className="premium-card rounded-[28px] border border-white/10 p-8 shadow-2xl">
+          <h2 className="mb-6 text-lg font-semibold text-white">Sign In to Your Account</h2>
 
           {error && (
             <div className="mb-4">
@@ -94,7 +90,7 @@ export default function LoginPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter your password"
                   required
-                  className="w-full input-glass rounded-xl px-4 py-2.5 text-sm pl-10 pr-10"
+                  className="w-full rounded-2xl border border-white/10 bg-slate-950/70 px-4 py-2.75 pl-10 pr-10 text-sm text-slate-100 outline-none transition focus:border-blue-400/40"
                 />
                 <button
                   type="button"
@@ -111,23 +107,22 @@ export default function LoginPage() {
             </Button>
           </form>
 
-          <div className="mt-6 pt-6 border-t border-white/10 text-center">
+          <div className="mt-6 border-t border-white/10 pt-6 text-center">
             <p className="text-sm text-slate-400">
               Don't have an account?{' '}
-              <Link to="/register" className="text-blue-400 hover:text-blue-300 font-medium">
+              <Link to="/register" className="font-medium text-blue-400 hover:text-blue-300">
                 Register here
               </Link>
             </p>
           </div>
 
-          {/* Demo credentials */}
-          <div className="mt-4 p-3 rounded-xl bg-blue-500/10 border border-blue-500/20">
-            <p className="text-xs text-blue-300 font-medium mb-1">Demo Credentials</p>
+          <div className="mt-4 rounded-2xl border border-blue-500/20 bg-blue-500/10 p-3">
+            <p className="mb-1 text-xs font-medium text-blue-300">Demo Credentials</p>
             <p className="text-xs text-slate-400">admin@investigation.gov / Admin@123456</p>
           </div>
         </div>
 
-        <p className="text-center text-xs text-slate-600 mt-6">
+        <p className="mt-6 text-center text-xs text-slate-600">
           © 2024 AI Investigation Assistant. Government Use Only.
         </p>
       </motion.div>

@@ -145,7 +145,7 @@ export default function SettingsPage() {
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
           {[
             { label: 'API Version', value: 'v1.0.0' },
-            { label: 'AI Model', value: 'Grok Beta' },
+            { label: 'AI Model', value: 'CaseMind AI' },
             { label: 'Backend', value: 'FastAPI' },
             { label: 'Database', value: 'MongoDB 8.3' },
             { label: 'User Role', value: user?.role || '—' },

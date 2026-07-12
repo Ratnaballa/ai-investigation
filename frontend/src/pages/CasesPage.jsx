@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import {
   MdAdd, MdFolder, MdSearch, MdEdit, MdDelete, MdVisibility,
-  MdFilterList, MdRefresh,
+  MdRefresh, MdShield, MdTune,
 } from 'react-icons/md';
 import { caseService } from '../services/caseService';
 import { getErrorMessage, statusColor, statusLabel, formatDate, truncate } from '../utils/helpers';
@@ -141,24 +141,24 @@ export default function CasesPage() {
       {success && <Alert type="success" message={success} onClose={() => setSuccess('')} />}
 
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="text-lg font-bold text-white">Case Management</h2>
-          <p className="text-sm text-slate-400">{total} total cases</p>
+          <h2 className="text-lg font-semibold text-white">Case Management</h2>
+          <p className="text-sm text-slate-400">{total} total cases · Active review queue</p>
         </div>
         <Button onClick={() => setCreateOpen(true)} icon={<MdAdd size={18} />}>New Case</Button>
       </div>
 
       {/* Filters */}
       <Card>
-        <div className="flex flex-col sm:flex-row gap-3">
-          <div className="flex-1 relative">
+        <div className="flex flex-col gap-3 sm:flex-row">
+          <div className="relative flex-1">
             <MdSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search by title or case number..."
-              className="w-full input-glass rounded-xl pl-9 pr-4 py-2.5 text-sm"
+              className="w-full rounded-2xl border border-white/10 bg-slate-950/60 py-2.5 pl-9 pr-4 text-sm text-slate-100 outline-none transition focus:border-blue-400/40"
             />
           </div>
           <Select
@@ -206,7 +206,11 @@ export default function CasesPage() {
                       <td className="py-3 px-3">
                         <div>
                           <p className="font-medium text-white">{truncate(c.title, 40)}</p>
-                          {c.is_sensitive && <span className="text-xs text-red-400">🔒 Sensitive</span>}
+                          {c.is_sensitive && (
+                            <span className="mt-1 inline-flex items-center gap-1 text-xs text-red-400">
+                              <MdShield size={12} /> Sensitive
+                            </span>
+                          )}
                         </div>
                       </td>
                       <td className="py-3 px-3">
@@ -222,7 +226,7 @@ export default function CasesPage() {
                           <button onClick={() => setEditCase(c)} className="p-1.5 rounded-lg text-slate-400 hover:text-amber-400 hover:bg-amber-500/10 transition-colors">
                             <MdEdit size={16} />
                           </button>
-                          <button onClick={() => handleDelete(c.id)} className="p-1.5 rounded-lg text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-colors">
+                          <button onClick={() => handleDelete(c.id)} className="p-1.5 rounded-lg text-red-500/60 hover:text-red-600 hover:bg-red-50 transition-all cursor-pointer">
                             <MdDelete size={16} />
                           </button>
                         </div>

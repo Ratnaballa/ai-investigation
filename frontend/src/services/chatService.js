@@ -25,4 +25,9 @@ export const chatService = {
     const { data } = await api.delete(`/chat/sessions/${sessionId}`);
     return data;
   },
+
+  async createSession() {
+    const { data } = await api.post('/chat/sessions');
+    return data;
+  },
 };

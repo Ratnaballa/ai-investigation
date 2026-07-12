@@ -74,28 +74,28 @@ export default function ProfilePage() {
       {/* Profile header */}
       <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}>
         <Card glow>
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5">
+          <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
             <div className="relative">
-              <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center text-white text-3xl font-bold shadow-xl">
+              <div className="flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-to-br from-blue-600 to-purple-600 text-3xl font-bold text-white shadow-xl">
                 {user.full_name?.charAt(0).toUpperCase()}
               </div>
               {user.is_verified && (
-                <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-green-500 flex items-center justify-center">
+                <div className="absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500">
                   <MdVerified className="text-white" size={14} />
                 </div>
               )}
             </div>
             <div className="flex-1">
-              <h2 className="text-xl font-bold text-white">{user.full_name}</h2>
-              <p className="text-slate-400 text-sm">{user.email}</p>
-              <div className="flex flex-wrap items-center gap-2 mt-2">
+              <h2 className="text-xl font-semibold text-white">{user.full_name}</h2>
+              <p className="text-sm text-slate-400">{user.email}</p>
+              <div className="mt-2 flex flex-wrap items-center gap-2">
                 <span className={`status-badge ${roleBadgeColor(user.role)}`}>{roleLabel(user.role)}</span>
                 {user.badge_number && (
-                  <span className="text-xs text-slate-400 flex items-center gap-1">
+                  <span className="flex items-center gap-1 text-xs text-slate-400">
                     <MdBadge size={12} /> {user.badge_number}
                   </span>
                 )}
-                <span className={`text-xs ${user.is_active ? 'text-green-400' : 'text-red-400'}`}>
+                <span className={`text-xs ${user.is_active ? 'text-emerald-400' : 'text-red-400'}`}>
                   ● {user.is_active ? 'Active' : 'Inactive'}
                 </span>
               </div>

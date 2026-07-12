@@ -21,6 +21,18 @@ class ChatSessionRepository(BaseRepository):
             {"$inc": {"message_count": count}, "$set": {"updated_at": self.now()}},
         )
 
+    async def update_session_activity(self, session_id: str, last_message: str, count: int = 2):
+        await self.collection.update_one(
+            {"session_id": session_id},
+            {
+                "$inc": {"message_count": count},
+                "$set": {
+                    "last_message": last_message,
+                    "updated_at": self.now()
+                }
+            },
+        )
+
     async def delete_user_session(self, session_id: str, user_id: str) -> int:
         result = await self.collection.delete_one({"session_id": session_id, "user_id": user_id})
         return result.deleted_count

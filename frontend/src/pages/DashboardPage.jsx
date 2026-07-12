@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
   MdFolder, MdChat, MdPeople, MdAssessment, MdGavel,
-  MdTrendingUp, MdWarning, MdCheckCircle,
+  MdTrendingUp, MdWarning, MdCheckCircle, MdAutoAwesome, MdTimeline,
 } from 'react-icons/md';
 import {
   AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid,
@@ -38,8 +38,8 @@ const BAR_DATA = [
 const CustomTooltip = ({ active, payload, label }) => {
   if (!active || !payload?.length) return null;
   return (
-    <div className="glass-dark rounded-xl p-3 text-xs border border-white/10">
-      <p className="text-slate-300 font-medium mb-1">{label}</p>
+    <div className="rounded-xl border border-white/10 bg-slate-950/90 p-3 text-xs text-slate-200 shadow-xl">
+      <p className="mb-1 font-medium text-slate-100">{label}</p>
       {payload.map((p) => (
         <p key={p.name} style={{ color: p.color }}>{p.name}: {p.value}</p>
       ))}
@@ -74,38 +74,61 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      {/* Welcome */}
-      <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}>
-        <h2 className="text-xl font-bold text-white">
-          Welcome back, {user?.full_name?.split(' ')[0]} 👋
-        </h2>
-        <p className="text-slate-400 text-sm mt-0.5">
-          Here's what's happening in your investigation portal today.
-        </p>
+      <motion.div
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="premium-card overflow-hidden rounded-[28px] border border-white/10"
+      >
+        <div className="flex flex-col gap-6 p-6 lg:flex-row lg:items-end lg:justify-between">
+          <div className="max-w-2xl">
+            <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-cyan-400/25 bg-cyan-500/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.24em] text-cyan-300">
+              <MdAutoAwesome size={14} />
+              Secure command center
+            </div>
+            <h2 className="text-2xl font-semibold text-white sm:text-3xl">
+              Welcome back, {user?.full_name?.split(' ')[0] || 'Officer'}
+            </h2>
+            <p className="mt-2 max-w-xl text-sm leading-6 text-slate-400">
+              Monitor investigations, legal analysis, and evidence relationships from one premium workspace designed for high-stakes operations.
+            </p>
+          </div>
+          <div className="grid gap-2 sm:grid-cols-2">
+            <div className="rounded-2xl border border-white/10 bg-slate-900/70 px-4 py-3">
+              <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">Live intake</p>
+              <p className="mt-1 text-xl font-semibold text-white">24 new</p>
+            </div>
+            <div className="rounded-2xl border border-white/10 bg-slate-900/70 px-4 py-3">
+              <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">Threat score</p>
+              <p className="mt-1 text-xl font-semibold text-emerald-400">Low</p>
+            </div>
+          </div>
+        </div>
       </motion.div>
 
-      {/* Stats grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-6">
         {stats.map((s) => <StatCard key={s.label} {...s} />)}
       </div>
 
-      {/* Charts row */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Area chart */}
+      <div className="grid gap-6 lg:grid-cols-3">
         <Card className="lg:col-span-2">
-          <h3 className="text-sm font-semibold text-white mb-4 flex items-center gap-2">
-            <MdTrendingUp className="text-blue-400" size={18} />
-            Cases & AI Consultations (2024)
-          </h3>
-          <ResponsiveContainer width="100%" height={220}>
+          <div className="mb-4 flex items-center justify-between">
+            <h3 className="flex items-center gap-2 text-sm font-semibold text-white">
+              <MdTrendingUp className="text-blue-400" size={18} />
+              Cases & AI Consultations
+            </h3>
+            <span className="rounded-full border border-blue-400/20 bg-blue-500/10 px-2.5 py-1 text-[11px] uppercase tracking-[0.24em] text-blue-300">
+              Weekly growth
+            </span>
+          </div>
+          <ResponsiveContainer width="100%" height={240}>
             <AreaChart data={AREA_DATA}>
               <defs>
                 <linearGradient id="cases" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3} />
+                  <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.35} />
                   <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
                 </linearGradient>
                 <linearGradient id="chats" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#a78bfa" stopOpacity={0.3} />
+                  <stop offset="5%" stopColor="#a78bfa" stopOpacity={0.35} />
                   <stop offset="95%" stopColor="#a78bfa" stopOpacity={0} />
                 </linearGradient>
               </defs>
@@ -119,12 +142,11 @@ export default function DashboardPage() {
           </ResponsiveContainer>
         </Card>
 
-        {/* Pie chart */}
         <Card>
-          <h3 className="text-sm font-semibold text-white mb-4">Case Status Distribution</h3>
-          <ResponsiveContainer width="100%" height={220}>
+          <h3 className="mb-4 text-sm font-semibold text-white">Case Status Distribution</h3>
+          <ResponsiveContainer width="100%" height={240}>
             <PieChart>
-              <Pie data={PIE_DATA} cx="50%" cy="45%" innerRadius={55} outerRadius={80} paddingAngle={3} dataKey="value">
+              <Pie data={PIE_DATA} cx="50%" cy="45%" innerRadius={55} outerRadius={84} paddingAngle={3} dataKey="value">
                 {PIE_DATA.map((entry) => <Cell key={entry.name} fill={entry.color} />)}
               </Pie>
               <Tooltip content={<CustomTooltip />} />
@@ -134,11 +156,9 @@ export default function DashboardPage() {
         </Card>
       </div>
 
-      {/* Bottom row */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Bar chart */}
+      <div className="grid gap-6 lg:grid-cols-3">
         <Card>
-          <h3 className="text-sm font-semibold text-white mb-4">Evidence by Type</h3>
+          <h3 className="mb-4 text-sm font-semibold text-white">Evidence by Type</h3>
           <ResponsiveContainer width="100%" height={200}>
             <BarChart data={BAR_DATA} layout="vertical">
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" horizontal={false} />
@@ -150,31 +170,33 @@ export default function DashboardPage() {
           </ResponsiveContainer>
         </Card>
 
-        {/* Recent cases */}
         <Card className="lg:col-span-2">
-          <h3 className="text-sm font-semibold text-white mb-4 flex items-center gap-2">
-            <MdFolder className="text-blue-400" size={18} />
-            Recent Cases
-          </h3>
+          <div className="mb-4 flex items-center justify-between">
+            <h3 className="flex items-center gap-2 text-sm font-semibold text-white">
+              <MdFolder className="text-blue-400" size={18} />
+              Recent Investigations
+            </h3>
+            <span className="text-[11px] uppercase tracking-[0.24em] text-slate-500">Live queue</span>
+          </div>
           {loading ? (
             <div className="space-y-3">
-              {[1,2,3].map(i => <div key={i} className="shimmer h-12 rounded-xl" />)}
+              {[1, 2, 3].map((i) => <div key={i} className="shimmer h-12 rounded-xl" />)}
             </div>
           ) : cases.length === 0 ? (
-            <div className="text-center py-8">
-              <MdFolder className="text-slate-600 mx-auto mb-2" size={32} />
-              <p className="text-slate-500 text-sm">No cases yet</p>
+            <div className="py-8 text-center">
+              <MdFolder className="mx-auto mb-2 text-slate-600" size={32} />
+              <p className="text-sm text-slate-500">No cases yet</p>
             </div>
           ) : (
             <div className="space-y-2">
               {cases.map((c) => (
-                <div key={c.id} className="flex items-center justify-between p-3 rounded-xl hover:bg-white/5 transition-colors">
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-8 h-8 rounded-lg bg-blue-500/20 flex items-center justify-center flex-shrink-0">
-                      <MdFolder className="text-blue-400" size={14} />
+                <div key={c.id} className="flex items-center justify-between rounded-2xl border border-white/10 bg-slate-900/50 p-3 transition hover:bg-white/5">
+                  <div className="flex min-w-0 items-center gap-3">
+                    <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-blue-500/20">
+                      <MdFolder className="text-blue-400" size={15} />
                     </div>
                     <div className="min-w-0">
-                      <p className="text-sm font-medium text-white truncate">{c.title}</p>
+                      <p className="truncate text-sm font-medium text-white">{c.title}</p>
                       <p className="text-xs text-slate-500">{c.case_number} · {formatDate(c.created_at)}</p>
                     </div>
                   </div>
@@ -188,21 +210,25 @@ export default function DashboardPage() {
         </Card>
       </div>
 
-      {/* System status */}
       <Card>
-        <h3 className="text-sm font-semibold text-white mb-4">System Status</h3>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div className="mb-4 flex items-center justify-between">
+          <h3 className="flex items-center gap-2 text-sm font-semibold text-white">
+            <MdTimeline className="text-cyan-400" size={18} />
+            Operational Timeline
+          </h3>
+          <span className="text-[11px] uppercase tracking-[0.24em] text-slate-500">Updated now</span>
+        </div>
+        <div className="grid gap-4 md:grid-cols-3">
           {[
             { label: 'API Server', status: 'Operational' },
-            { label: 'Grok AI', status: 'Operational' },
+            { label: 'CaseMind AI', status: 'Operational' },
             { label: 'Database', status: 'Operational' },
-            { label: 'RAG Pipeline', status: 'Standby' },
           ].map((s) => (
-            <div key={s.label} className="flex items-center gap-2 p-3 rounded-xl bg-white/5">
-              <MdCheckCircle className={s.status === 'Operational' ? 'text-green-400' : 'text-amber-400'} size={16} />
+            <div key={s.label} className="flex items-center gap-3 rounded-2xl border border-white/10 bg-slate-900/50 p-3">
+              <MdCheckCircle className={s.status === 'Operational' ? 'text-emerald-400' : 'text-amber-400'} size={18} />
               <div>
-                <p className="text-xs font-medium text-white">{s.label}</p>
-                <p className={`text-xs ${s.status === 'Operational' ? 'text-green-400' : 'text-amber-400'}`}>{s.status}</p>
+                <p className="text-sm font-medium text-white">{s.label}</p>
+                <p className={`text-xs ${s.status === 'Operational' ? 'text-emerald-400' : 'text-amber-400'}`}>{s.status}</p>
               </div>
             </div>
           ))}

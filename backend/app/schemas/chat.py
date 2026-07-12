@@ -134,6 +134,8 @@ class ChatSessionResponse(BaseModel):
     message_count: int
     is_active: bool
     created_at: datetime
+    updated_at: Optional[datetime] = None
+    last_message: Optional[str] = None
 
     model_config = {"populate_by_name": True}
 

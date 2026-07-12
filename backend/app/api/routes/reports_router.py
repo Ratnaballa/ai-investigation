@@ -10,12 +10,14 @@ from app.services.report_service import ReportService
 router = APIRouter(prefix="/reports", tags=["Reports"])
 
 
-def _report_to_response(report) -> ReportResponse:
+async def _report_to_response(report, service: ReportService) -> ReportResponse:
+    name = await service.get_user_name(report.created_by)
     return ReportResponse(
         id=str(report.id), case_id=report.case_id, title=report.title,
         report_type=report.report_type, content=report.content,
         summary=report.summary, file_path=report.file_path,
-        created_by=report.created_by, is_finalized=report.is_finalized,
+        created_by=report.created_by, created_by_name=name,
+        is_finalized=report.is_finalized,
         tags=report.tags, created_at=report.created_at, updated_at=report.updated_at,
     )
 
@@ -28,7 +30,8 @@ async def create_report(
     service: ReportService = Depends(get_report_service),
 ):
     """Create a manual report."""
-    return _report_to_response(await service.create_report(data, current_user["_id"]))
+    report = await service.create_report(data, current_user["_id"])
+    return await _report_to_response(report, service)
 
 
 @router.post("/generate", response_model=ReportResponse, status_code=status.HTTP_201_CREATED,
@@ -39,7 +42,8 @@ async def generate_ai_report(
     service: ReportService = Depends(get_report_service),
 ):
     """Generate an AI-powered report for a case using Grok."""
-    return _report_to_response(await service.generate_ai_report(request, current_user["_id"]))
+    report = await service.generate_ai_report(request, current_user["_id"])
+    return await _report_to_response(report, service)
 
 
 @router.get("", response_model=PaginatedResponse, dependencies=[Depends(require_legal_professional)])
@@ -51,8 +55,9 @@ async def list_reports(
 ):
     """List reports."""
     reports, total = await service.list_reports(page, page_size, case_id)
+    items = [await _report_to_response(r, service) for r in reports]
     return PaginatedResponse(
-        items=[_report_to_response(r) for r in reports],
+        items=items,
         total=total, page=page, page_size=page_size,
         total_pages=math.ceil(total / page_size) if total else 0,
     )
@@ -61,14 +66,16 @@ async def list_reports(
 @router.get("/{report_id}", response_model=ReportResponse, dependencies=[Depends(require_legal_professional)])
 async def get_report(report_id: str, service: ReportService = Depends(get_report_service)):
     """Get a specific report."""
-    return _report_to_response(await service.get_report(report_id))
+    report = await service.get_report(report_id)
+    return await _report_to_response(report, service)
 
 
 @router.post("/{report_id}/finalize", response_model=ReportResponse,
              dependencies=[Depends(require_law_enforcement)])
 async def finalize_report(report_id: str, service: ReportService = Depends(get_report_service)):
     """Mark a report as finalized."""
-    return _report_to_response(await service.finalize_report(report_id))
+    report = await service.finalize_report(report_id)
+    return await _report_to_response(report, service)
 
 
 @router.delete("/{report_id}", response_model=SuccessResponse,

@@ -22,15 +22,22 @@ class BaseRepository:
         return self.db[self.collection_name]
 
     @staticmethod
-    def to_object_id(id_str: str) -> ObjectId:
-        return ObjectId(id_str)
+    def to_object_id(id_str: str) -> Optional[ObjectId]:
+        from bson.errors import InvalidId
+        try:
+            return ObjectId(id_str)
+        except (InvalidId, ValueError, TypeError):
+            return None
 
     @staticmethod
     def now() -> datetime:
         return datetime.now(timezone.utc)
 
     async def find_by_id(self, id_str: str) -> Optional[dict]:
-        return await self.collection.find_one({"_id": self.to_object_id(id_str)})
+        obj_id = self.to_object_id(id_str)
+        if obj_id is None:
+            return None
+        return await self.collection.find_one({"_id": obj_id})
 
     async def find_one(self, query: dict) -> Optional[dict]:
         return await self.collection.find_one(query)
@@ -58,14 +65,20 @@ class BaseRepository:
         return document
 
     async def update_by_id(self, id_str: str, update_data: dict) -> int:
+        obj_id = self.to_object_id(id_str)
+        if obj_id is None:
+            return 0
         update_data["updated_at"] = self.now()
         result = await self.collection.update_one(
-            {"_id": self.to_object_id(id_str)}, {"$set": update_data}
+            {"_id": obj_id}, {"$set": update_data}
         )
         return result.matched_count
 
     async def delete_by_id(self, id_str: str) -> int:
-        result = await self.collection.delete_one({"_id": self.to_object_id(id_str)})
+        obj_id = self.to_object_id(id_str)
+        if obj_id is None:
+            return 0
+        result = await self.collection.delete_one({"_id": obj_id})
         return result.deleted_count
 
     async def delete_many(self, query: dict) -> int:

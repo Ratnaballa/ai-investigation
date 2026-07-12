@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, Query
-from app.schemas.chat import ChatRequest, LegalChatResponse, ChatHistoryResponse
+from app.schemas.chat import ChatRequest, LegalChatResponse, ChatHistoryResponse, ChatSessionResponse
 from app.schemas.common import SuccessResponse
 from app.api.auth.dependencies import get_current_user
 from app.dependencies import get_chat_service
@@ -13,16 +13,16 @@ router = APIRouter(prefix="/chat", tags=["Chatbot"])
     response_model=LegalChatResponse,
     summary="Analyse a legal query",
     description=(
-        "Send a legal question or case description to the Grok AI. "
+        "Send a legal question or case description to the CaseMind AI. "
         "Returns a structured analysis with applicable BNS/IPC sections, "
         "investigation procedure, required evidence, and legal precautions.\n\n"
-        "Set `use_rag: false` (default) for direct Grok analysis. "
+        "Set `use_rag: false` (default) for direct CaseMind analysis. "
         "Set `use_rag: true` only when a FAISS document index has been populated."
     ),
     responses={
         200: {"description": "Structured legal analysis returned"},
         401: {"description": "Missing or invalid access token"},
-        503: {"description": "Grok API is temporarily unavailable"},
+        503: {"description": "CaseMind AI service is temporarily unavailable"},
     },
 )
 async def chat(
@@ -30,8 +30,17 @@ async def chat(
     current_user: dict = Depends(get_current_user),
     service: ChatService = Depends(get_chat_service),
 ):
-    """Analyse a legal query using the Grok AI and return structured JSON."""
+    """Analyse a legal query using the CaseMind AI and return structured JSON."""
     return await service.chat(request, current_user["_id"])
+
+
+@router.post("/sessions", response_model=ChatSessionResponse)
+async def create_session(
+    current_user: dict = Depends(get_current_user),
+    service: ChatService = Depends(get_chat_service),
+):
+    """Create a new empty chat session."""
+    return await service.create_session(current_user["_id"])
 
 
 @router.get("/sessions", response_model=dict)

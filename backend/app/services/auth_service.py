@@ -103,7 +103,7 @@ class AuthService:
 
         # Constant-time: always call verify_password even when user not found
         # to prevent timing-based user enumeration.
-        dummy_hash = "$2b$12$KIXtq5Ow3Ow3Ow3Ow3Ow3OeKIXtq5Ow3Ow3Ow3Ow3Ow3Ow3Ow3O"
+        dummy_hash = "$2b$12$KB5g14l3N7V306P/2R5vI.o9Hh8aZ27.gN0mYf7gR6e6d5c4b3a2a"
         stored_hash = user_doc["hashed_password"] if user_doc else dummy_hash
 
         password_ok = verify_password(data.password, stored_hash)

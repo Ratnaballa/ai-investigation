@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   MdSend, MdChat, MdDelete, MdAdd, MdGavel, MdSearch,
   MdExpandMore, MdExpandLess, MdShield, MdAssignment,
-  MdWarning, MdSource, MdPerson, MdSmartToy,
+  MdWarning, MdSource, MdPerson, MdSmartToy, MdAutoAwesome,
 } from 'react-icons/md';
 import { chatService } from '../services/chatService';
 import { getErrorMessage, formatDateTime } from '../utils/helpers';
@@ -14,10 +14,10 @@ import { Spinner, Alert } from '../components/ui/index.jsx';
 function BNSCard({ section }) {
   const [open, setOpen] = useState(false);
   return (
-    <div className="rounded-xl border border-blue-500/20 bg-blue-500/5 overflow-hidden">
+    <div className="overflow-hidden rounded-2xl border border-blue-500/20 bg-blue-500/10">
       <button
         onClick={() => setOpen(!open)}
-        className="w-full flex items-center justify-between p-3 text-left hover:bg-blue-500/10 transition-colors"
+        className="flex w-full items-center justify-between p-3 text-left transition hover:bg-blue-500/10"
       >
         <div className="flex items-center gap-2 min-w-0">
           <MdGavel className="text-blue-400 flex-shrink-0" size={16} />
@@ -66,7 +66,7 @@ function LegalResponsePanel({ response }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-      className="space-y-4 mt-4"
+      className="mt-4 space-y-4"
     >
       {/* Case Summary */}
       <div className="glass rounded-xl p-4">
@@ -160,11 +160,24 @@ export default function ChatPage() {
   const [sessionsLoading, setSessionsLoading] = useState(true);
   const [error, setError] = useState('');
   const [lastResponse, setLastResponse] = useState(null);
+  const [deleteConfirmId, setDeleteConfirmId] = useState(null);
   const bottomRef = useRef(null);
   const inputRef = useRef(null);
 
   useEffect(() => {
-    loadSessions();
+    const init = async () => {
+      setSessionsLoading(true);
+      try {
+        const data = await chatService.getSessions();
+        const loadedSessions = data.sessions || data.items || [];
+        setSessions(loadedSessions);
+        if (loadedSessions.length > 0) {
+          loadSession(loadedSessions[0].id);
+        }
+      } catch {}
+      finally { setSessionsLoading(false); }
+    };
+    init();
   }, []);
 
   useEffect(() => {
@@ -185,30 +198,66 @@ export default function ChatPage() {
     setLastResponse(null);
     try {
       const data = await chatService.getSessionHistory(sessionId);
-      const msgs = (data.messages || []).map((m) => ({
-        role: m.role,
-        content: m.content,
-        time: m.created_at,
-      }));
+      const msgs = (data.messages || []).map((m) => {
+        if (m.role === 'assistant') {
+          try {
+            const parsed = JSON.parse(m.content);
+            return {
+              role: 'assistant',
+              content: parsed.case_summary || 'Analysis complete. See structured response below.',
+              time: m.created_at,
+              isStructured: true,
+              response: parsed,
+            };
+          } catch (e) {
+            return {
+              role: 'assistant',
+              content: m.content,
+              time: m.created_at,
+            };
+          }
+        }
+        return {
+          role: 'user',
+          content: m.content,
+          time: m.created_at,
+        };
+      });
       setMessages(msgs);
     } catch {}
   };
 
-  const newChat = () => {
-    setActiveSession(null);
-    setMessages([]);
-    setLastResponse(null);
-    setError('');
-    inputRef.current?.focus();
+  const newChat = async () => {
+    try {
+      const newSession = await chatService.createSession();
+      setSessions((prev) => [newSession, ...prev]);
+      setActiveSession(newSession.id);
+      setMessages([]);
+      setLastResponse(null);
+      setError('');
+      setTimeout(() => {
+        inputRef.current?.focus();
+      }, 0);
+    } catch (err) {
+      setError(getErrorMessage(err));
+    }
   };
 
-  const deleteSession = async (id, e) => {
-    e.stopPropagation();
+  const deleteSession = async (id) => {
     try {
       await chatService.deleteSession(id);
-      setSessions((s) => s.filter((x) => x.id !== id));
-      if (activeSession === id) newChat();
-    } catch {}
+      const remaining = sessions.filter((x) => x.id !== id);
+      setSessions(remaining);
+      if (activeSession === id) {
+        if (remaining.length > 0) {
+          loadSession(remaining[0].id);
+        } else {
+          await newChat();
+        }
+      }
+    } catch (err) {
+      setError(getErrorMessage(err));
+    }
   };
 
   const sendMessage = async (e) => {
@@ -225,6 +274,17 @@ export default function ChatPage() {
       if (!activeSession) {
         setActiveSession(res.session_id);
         loadSessions();
+      } else {
+        setSessions((prev) => {
+          const updated = prev.map((s) =>
+            s.id === activeSession
+              ? { ...s, last_message: text, updated_at: new Date().toISOString() }
+              : s
+          );
+          return [...updated].sort(
+            (a, b) => new Date(b.updated_at || b.created_at) - new Date(a.updated_at || a.created_at)
+          );
+        });
       }
       setLastResponse(res);
       setMessages((m) => [...m, {
@@ -252,10 +312,10 @@ export default function ChatPage() {
   return (
     <div className="flex h-[calc(100vh-5rem)] gap-4">
       {/* Sessions sidebar */}
-      <div className="hidden md:flex flex-col w-64 glass rounded-2xl overflow-hidden flex-shrink-0">
-        <div className="p-3 border-b border-white/10">
+      <div className="hidden w-72 flex-shrink-0 flex-col overflow-hidden rounded-[24px] border border-white/10 bg-slate-950/50 md:flex">
+        <div className="border-b border-white/10 p-3">
           <Button onClick={newChat} className="w-full" size="sm" icon={<MdAdd size={16} />}>
-            New Chat
+            New Investigation
           </Button>
         </div>
         <div className="flex-1 overflow-y-auto p-2">
@@ -264,41 +324,75 @@ export default function ChatPage() {
           ) : sessions.length === 0 ? (
             <p className="text-xs text-slate-500 text-center py-8">No sessions yet</p>
           ) : (
-            sessions.map((s) => (
-              <button
-                key={s.id}
-                onClick={() => loadSession(s.id)}
-                className={`w-full text-left p-2.5 rounded-xl mb-1 group flex items-center justify-between transition-all ${
-                  activeSession === s.id ? 'bg-blue-500/20 text-blue-300' : 'text-slate-400 hover:bg-white/5 hover:text-white'
-                }`}
-              >
-                <div className="flex items-center gap-2 min-w-0">
-                  <MdChat size={14} className="flex-shrink-0" />
-                  <span className="text-xs truncate">{s.title || 'Chat Session'}</span>
-                </div>
-                <button
-                  onClick={(e) => deleteSession(s.id, e)}
-                  className="opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-300 p-0.5 rounded transition-all"
+            sessions.map((s) => {
+              const isActive = activeSession === s.id;
+              return (
+                <div
+                  key={s.id}
+                  onClick={() => loadSession(s.id)}
+                  className={`group relative mb-2 flex flex-col gap-1.5 rounded-2xl p-3 text-left transition-all duration-300 cursor-pointer border ${
+                    isActive
+                      ? 'bg-gradient-to-r from-blue-500/15 to-purple-500/15 border-blue-500/40 text-blue-100 shadow-md shadow-blue-500/5'
+                      : 'border-transparent bg-white/0 text-slate-400 hover:bg-white/[0.04] hover:text-white hover:border-white/5'
+                  }`}
                 >
-                  <MdDelete size={14} />
-                </button>
-              </button>
-            ))
+                  {/* Active Indicator Bar */}
+                  {isActive && (
+                    <div className="absolute left-0 top-3 bottom-3 w-1 rounded-r-md bg-blue-500" />
+                  )}
+
+                  {/* Header: Title and Delete icon */}
+                  <div className="flex items-start justify-between gap-2 min-w-0">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <MdChat size={14} className={`flex-shrink-0 ${isActive ? 'text-blue-400' : 'text-slate-500'}`} />
+                      <span className={`text-xs font-semibold truncate ${isActive ? 'text-blue-100' : 'text-slate-300'}`}>
+                        {s.title || 'New Investigation'}
+                      </span>
+                    </div>
+                    
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setDeleteConfirmId(s.id);
+                      }}
+                      className="rounded p-1 text-red-500/60 hover:text-red-600 hover:bg-red-50 transition-all cursor-pointer opacity-100"
+                    >
+                      <MdDelete size={14} />
+                    </button>
+                  </div>
+
+                  {/* Last message preview */}
+                  <p className={`text-[11px] truncate px-5 ${isActive ? 'text-blue-200/60' : 'text-slate-500 group-hover:text-slate-400'}`}>
+                    {s.last_message || 'No messages yet'}
+                  </p>
+
+                  {/* Footer: Time */}
+                  <div className="flex items-center justify-between px-5 mt-0.5">
+                    <span className="text-[10px] text-slate-600 group-hover:text-slate-500 font-mono">
+                      {s.updated_at ? formatDateTime(s.updated_at) : formatDateTime(s.created_at)}
+                    </span>
+                    {isActive && (
+                      <span className="text-[9px] font-semibold tracking-wider text-blue-400 uppercase">Active</span>
+                    )}
+                  </div>
+                </div>
+              );
+            })
           )}
         </div>
       </div>
 
       {/* Main chat area */}
-      <div className="flex-1 flex flex-col glass rounded-2xl overflow-hidden min-w-0">
+      <div className="flex min-w-0 flex-1 flex-col overflow-hidden rounded-[24px] border border-white/10 bg-slate-950/55">
         {/* Header */}
-        <div className="px-4 py-3 border-b border-white/10 flex items-center justify-between">
+        <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+            <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600">
               <MdSmartToy className="text-white" size={16} />
             </div>
             <div>
-              <p className="text-sm font-semibold text-white">Grok Legal AI</p>
-              <p className="text-xs text-green-400">● Online</p>
+              <p className="text-sm font-semibold text-white">CaseMind AI</p>
+              <p className="text-xs text-emerald-400">● Online</p>
             </div>
           </div>
           <Button onClick={newChat} variant="secondary" size="sm" icon={<MdAdd size={14} />}>
@@ -307,22 +401,22 @@ export default function ChatPage() {
         </div>
 
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        <div className="flex-1 space-y-4 overflow-y-auto p-4">
           {messages.length === 0 && !loading && (
-            <div className="flex flex-col items-center justify-center h-full text-center py-8">
-              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500/20 to-purple-500/20 border border-blue-500/20 flex items-center justify-center mb-4">
+            <div className="flex h-full flex-col items-center justify-center py-8 text-center">
+              <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl border border-blue-500/20 bg-gradient-to-br from-blue-500/20 to-purple-500/20">
                 <MdGavel className="text-blue-400" size={28} />
               </div>
-              <h3 className="text-lg font-semibold text-white mb-2">AI Legal Assistant</h3>
-              <p className="text-sm text-slate-400 max-w-md mb-6">
+              <h3 className="mb-2 text-lg font-semibold text-white">AI Legal Assistant</h3>
+              <p className="mb-6 max-w-md text-sm text-slate-400">
                 Describe a legal case or situation to get structured analysis with applicable BNS/IPC sections, investigation procedure, and legal precautions.
               </p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full max-w-lg">
+              <div className="grid w-full max-w-lg grid-cols-1 gap-2 sm:grid-cols-2">
                 {SUGGESTIONS.map((s, i) => (
                   <button
                     key={i}
                     onClick={() => setInput(s)}
-                    className="text-left p-3 rounded-xl glass text-xs text-slate-300 hover:text-white hover:bg-white/10 transition-all border border-white/5"
+                    className="rounded-2xl border border-white/10 bg-slate-900/60 p-3 text-left text-xs text-slate-300 transition hover:bg-white/10 hover:text-white"
                   >
                     {s}
                   </button>
@@ -367,7 +461,10 @@ export default function ChatPage() {
               <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center flex-shrink-0">
                 <MdSmartToy className="text-white" size={14} />
               </div>
-              <div className="chat-bubble-ai px-4 py-3 flex items-center gap-2">
+              <div className="chat-bubble-ai flex items-center gap-2 px-4 py-3">
+                <div className="rounded-full border border-cyan-400/20 bg-cyan-500/10 p-1.5">
+                  <MdAutoAwesome className="text-cyan-300" size={14} />
+                </div>
                 <Spinner size="sm" />
                 <span className="text-sm text-slate-400">Analysing legal query...</span>
               </div>
@@ -385,8 +482,8 @@ export default function ChatPage() {
         )}
 
         {/* Input */}
-        <form onSubmit={sendMessage} className="p-4 border-t border-white/10">
-          <div className="flex gap-2">
+        <form onSubmit={sendMessage} className="border-t border-white/10 p-4">
+          <div className="flex flex-col gap-2 sm:flex-row">
             <textarea
               ref={inputRef}
               value={input}
@@ -394,7 +491,7 @@ export default function ChatPage() {
               onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(e); } }}
               placeholder="Describe a legal case or ask a legal question... (Enter to send, Shift+Enter for new line)"
               rows={2}
-              className="flex-1 input-glass rounded-xl px-4 py-3 text-sm resize-none"
+              className="flex-1 resize-none rounded-2xl border border-white/10 bg-slate-900/70 px-4 py-3 text-sm text-slate-100 outline-none transition focus:border-blue-400/40"
             />
             <Button
               type="submit"
@@ -408,6 +505,44 @@ export default function ChatPage() {
           </div>
         </form>
       </div>
+
+      {/* Confirmation Dialog */}
+      <AnimatePresence>
+        {deleteConfirmId && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="w-full max-w-sm rounded-[24px] border border-white/10 bg-slate-900 p-6 shadow-2xl"
+            >
+              <h3 className="mb-2 text-lg font-bold text-white">Delete Investigation?</h3>
+              <p className="mb-6 text-sm text-slate-400">
+                This will permanently delete this conversation and all associated messages. This action cannot be undone.
+              </p>
+              <div className="flex justify-end gap-3">
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => setDeleteConfirmId(null)}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  variant="danger"
+                  size="sm"
+                  onClick={() => {
+                    deleteSession(deleteConfirmId);
+                    setDeleteConfirmId(null);
+                  }}
+                >
+                  Delete
+                </Button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
