@@ -41,6 +41,7 @@ from app.api.routes import (
     users_router,
     chat_router,
     legal_router,
+    legal_history_router,
     cases_router,
     graph_router,
     documents_router,
@@ -219,15 +220,16 @@ async def global_exception_handler(request: Request, exc: Exception):
 
 API_PREFIX = "/api/v1"
 
-app.include_router(auth_router,      prefix=API_PREFIX)
-app.include_router(users_router,     prefix=API_PREFIX)
-app.include_router(chat_router,      prefix=API_PREFIX)
-app.include_router(legal_router,     prefix=API_PREFIX)
-app.include_router(cases_router,     prefix=API_PREFIX)
-app.include_router(graph_router,     prefix=API_PREFIX)
-app.include_router(documents_router, prefix=API_PREFIX)
-app.include_router(reports_router,   prefix=API_PREFIX)
-app.include_router(admin_router,     prefix=API_PREFIX)
+app.include_router(auth_router,          prefix=API_PREFIX)
+app.include_router(users_router,         prefix=API_PREFIX)
+app.include_router(chat_router,          prefix=API_PREFIX)
+app.include_router(legal_router,         prefix=API_PREFIX)
+app.include_router(legal_history_router, prefix=API_PREFIX)
+app.include_router(cases_router,         prefix=API_PREFIX)
+app.include_router(graph_router,         prefix=API_PREFIX)
+app.include_router(documents_router,     prefix=API_PREFIX)
+app.include_router(reports_router,       prefix=API_PREFIX)
+app.include_router(admin_router,         prefix=API_PREFIX)
 
 
 # ── Health endpoints ──────────────────────────────────────────────────────────

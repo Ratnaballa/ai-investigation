@@ -6,7 +6,7 @@ import { authService } from '../services/authService';
 import { getErrorMessage } from '../utils/helpers';
 import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
-import { Select, Alert } from '../components/ui/index.jsx';
+import { Alert } from '../components/ui/index.jsx';
 
 const ROLES = [
   { value: 'public', label: 'Public' },
@@ -75,7 +75,19 @@ export default function RegisterPage() {
               <Input label="Email" type="email" value={form.email} onChange={set('email')} placeholder="officer@police.gov.in" required icon={<MdEmail size={16} />} />
             </div>
             <Input label="Password" type="password" value={form.password} onChange={set('password')} placeholder="Min 8 chars, uppercase, digit, special" required icon={<MdLock size={16} />} />
-            <Select label="Role" value={form.role} onChange={set('role')} options={ROLES} required />
+            <div className="flex flex-col gap-1.5">
+              <label className="text-sm font-medium text-slate-300">Role <span className="text-red-400">*</span></label>
+              <select
+                value={form.role}
+                onChange={set('role')}
+                required
+                className="cursor-pointer rounded-2xl border border-white/10 bg-slate-800 px-4 py-2.5 text-sm text-slate-100 outline-none appearance-none transition focus:border-blue-400/60 focus:bg-slate-700"
+              >
+                {ROLES.map((o) => (
+                  <option key={o.value} value={o.value} className="bg-slate-800 text-slate-100 py-2">{o.label}</option>
+                ))}
+              </select>
+            </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Input label="Badge Number" value={form.badge_number} onChange={set('badge_number')} placeholder="MH-1234" icon={<MdBadge size={16} />} />
               <Input label="Phone" value={form.phone} onChange={set('phone')} placeholder="+919876543210" icon={<MdPhone size={16} />} />
