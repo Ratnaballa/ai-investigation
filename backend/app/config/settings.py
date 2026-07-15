@@ -2,7 +2,7 @@ from pydantic_settings import BaseSettings
 from pydantic import field_validator
 from typing import List
 from functools import lru_cache
-
+import os
 
 class Settings(BaseSettings):
     # Application
@@ -13,7 +13,7 @@ class Settings(BaseSettings):
 
     # Server
     HOST: str = "0.0.0.0"
-    PORT: int = 8000
+    PORT: int = int(os.getenv("PORT", 8000))
 
     # MongoDB
     MONGODB_URL: str = "mongodb://localhost:27017"
