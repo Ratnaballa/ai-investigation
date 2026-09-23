@@ -2,8 +2,25 @@ import api from './api';
 
 export const graphService = {
   async getGraph(caseId = null) {
-    const params = caseId ? { case_id: caseId } : {};
-    const { data } = await api.get('/graph', { params });
+    if (caseId) {
+      const { data } = await api.get(`/graph/cases/${caseId}`);
+      return data;
+    }
+    const { data } = await api.get('/graph');
+    return data;
+  },
+
+  async generateAIGraph(caseId) {
+    const { data } = await api.post(`/graph/cases/${caseId}/generate`);
+    return data;
+  },
+
+  async uploadEvidenceFile(caseId, file) {
+    const formData = new FormData();
+    formData.append('file', file);
+    const { data } = await api.post(`/graph/cases/${caseId}/upload-evidence`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
     return data;
   },
 
@@ -12,13 +29,23 @@ export const graphService = {
     return data;
   },
 
-  async addEdge(payload) {
-    const { data } = await api.post('/graph/edges', payload);
+  async updateNode(nodeId, payload) {
+    const { data } = await api.put(`/graph/nodes/${nodeId}`, payload);
     return data;
   },
 
   async deleteNode(nodeId) {
     const { data } = await api.delete(`/graph/nodes/${nodeId}`);
+    return data;
+  },
+
+  async addEdge(payload) {
+    const { data } = await api.post('/graph/edges', payload);
+    return data;
+  },
+
+  async deleteEdge(edgeId) {
+    const { data } = await api.delete(`/graph/edges/${edgeId}`);
     return data;
   },
 };

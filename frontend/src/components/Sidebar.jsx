@@ -27,28 +27,28 @@ export default function Sidebar({ open, onClose }) {
   };
 
   const SidebarContent = () => (
-    <div className="flex flex-col h-full">
-      <div className="px-5 py-5 border-b border-white/10">
-        <div className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 p-3">
-          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 via-cyan-500 to-indigo-600 shadow-lg shadow-blue-500/20">
-            <MdShield className="text-white" size={22} />
+    <div className="flex flex-col h-full bg-white dark:bg-slate-900 text-slate-900 dark:text-white transition-colors">
+      <div className="px-5 py-5 border-b border-slate-200 dark:border-slate-800">
+        <div className="flex items-center gap-3 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 px-3 py-3">
+          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600 shadow-md text-white">
+            <MdShield size={22} />
           </div>
           <div>
-            <p className="text-sm font-semibold text-white">AI Investigation</p>
-            <p className="text-xs text-blue-300">Assistant Platform</p>
+            <p className="text-sm font-bold text-slate-900 dark:text-white">AI Investigation</p>
+            <p className="text-xs text-blue-600 dark:text-blue-400 font-semibold">Assistant Platform</p>
           </div>
         </div>
       </div>
 
       {user && (
-        <div className="px-4 py-4 border-b border-white/10">
-          <div className="flex items-center gap-3 rounded-2xl border border-white/10 bg-slate-900/60 p-3">
-            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-blue-600 to-purple-600 text-sm font-bold text-white">
+        <div className="px-4 py-4 border-b border-slate-200 dark:border-slate-800">
+          <div className="flex items-center gap-3 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 p-3">
+            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 text-sm font-bold text-white shadow-sm">
               {user.full_name?.charAt(0).toUpperCase()}
             </div>
             <div className="min-w-0">
-              <p className="truncate text-sm font-semibold text-white">{user.full_name}</p>
-              <span className={`status-badge ${roleBadgeColor(user.role)}`}>
+              <p className="truncate text-sm font-bold text-slate-900 dark:text-white">{user.full_name}</p>
+              <span className={`status-badge mt-0.5 inline-block text-[11px] font-semibold ${roleBadgeColor(user.role)}`}>
                 {roleLabel(user.role)}
               </span>
             </div>
@@ -63,8 +63,10 @@ export default function Sidebar({ open, onClose }) {
             to={to}
             onClick={onClose}
             className={({ isActive }) =>
-              `sidebar-item flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-medium ${
-                isActive ? 'active text-blue-100' : 'text-slate-400 hover:text-white'
+              `sidebar-item flex items-center gap-3 rounded-2xl px-3.5 py-2.5 text-sm font-medium transition-all ${
+                isActive
+                  ? 'active text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20 font-bold'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/60'
               }`
             }
           >
@@ -74,10 +76,10 @@ export default function Sidebar({ open, onClose }) {
         ))}
       </nav>
 
-      <div className="px-3 py-4 border-t border-white/10">
+      <div className="px-3 py-4 border-t border-slate-200 dark:border-slate-800">
         <button
           onClick={handleLogout}
-          className="sidebar-item flex w-full items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-medium text-red-300 hover:text-red-200"
+          className="sidebar-item flex w-full items-center gap-3 rounded-2xl px-3.5 py-2.5 text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition"
         >
           <MdLogout size={19} />
           Logout
@@ -88,7 +90,7 @@ export default function Sidebar({ open, onClose }) {
 
   return (
     <>
-      <aside className="hidden lg:flex h-screen w-72 flex-shrink-0 flex-col sticky top-0 border-r border-white/10 glass-dark">
+      <aside className="hidden lg:flex h-screen w-72 flex-shrink-0 flex-col sticky top-0 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm transition-colors z-30">
         <SidebarContent />
       </aside>
 
@@ -97,17 +99,17 @@ export default function Sidebar({ open, onClose }) {
           <>
             <motion.div
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              className="fixed inset-0 z-40 bg-slate-950/70 lg:hidden"
+              className="fixed inset-0 z-40 bg-slate-900/40 dark:bg-slate-950/70 lg:hidden"
               onClick={onClose}
             />
             <motion.aside
               initial={{ x: -280 }} animate={{ x: 0 }} exit={{ x: -280 }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="fixed left-0 top-0 bottom-0 z-50 w-72 glass-dark border-r border-white/10 lg:hidden"
+              className="fixed left-0 top-0 bottom-0 z-50 w-72 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 lg:hidden shadow-2xl"
             >
               <button
                 onClick={onClose}
-                className="absolute right-4 top-4 rounded-lg p-1.5 text-slate-400 transition hover:bg-white/10 hover:text-white"
+                className="absolute right-4 top-4 rounded-xl p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition"
               >
                 <MdClose size={20} />
               </button>

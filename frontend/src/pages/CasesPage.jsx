@@ -56,9 +56,9 @@ function CaseForm({ initial = {}, onSubmit, loading }) {
           type="checkbox"
           checked={form.is_sensitive}
           onChange={(e) => setForm((f) => ({ ...f, is_sensitive: e.target.checked }))}
-          className="w-4 h-4 rounded accent-blue-500"
+          className="w-4 h-4 rounded accent-blue-600 cursor-pointer"
         />
-        <span className="text-sm text-slate-300">Mark as Sensitive Case</span>
+        <span className="text-sm font-semibold text-slate-800 dark:text-slate-200">Mark as Sensitive Case</span>
       </label>
       <Button type="submit" loading={loading} className="w-full">
         {initial.id ? 'Update Case' : 'Create Case'}
@@ -98,67 +98,78 @@ export default function CasesPage() {
 
   useEffect(() => { load(); }, [load]);
 
-  const handleCreate = async (form) => {
-    setFormLoading(true);
+  const handleCreate = async (formData) => {
+    setFormLoading(true); setError(''); setSuccess('');
     try {
-      await caseService.createCase(form);
+      const res = await caseService.createCase(formData);
+      setCases((c) => [res, ...c]);
       setCreateOpen(false);
       setSuccess('Case created successfully');
-      load();
-    } catch (err) { setError(getErrorMessage(err)); }
-    finally { setFormLoading(false); }
+    } catch (err) {
+      setError(getErrorMessage(err));
+    } finally {
+      setFormLoading(false);
+    }
   };
 
-  const handleUpdate = async (form) => {
-    setFormLoading(true);
+  const handleUpdate = async (formData) => {
+    setFormLoading(true); setError(''); setSuccess('');
     try {
-      await caseService.updateCase(editCase.id, form);
+      const res = await caseService.updateCase(editCase.id, formData);
+      setCases((c) => c.map((x) => (x.id === editCase.id ? res : x)));
       setEditCase(null);
       setSuccess('Case updated successfully');
-      load();
-    } catch (err) { setError(getErrorMessage(err)); }
-    finally { setFormLoading(false); }
+    } catch (err) {
+      setError(getErrorMessage(err));
+    } finally {
+      setFormLoading(false);
+    }
   };
 
   const handleDelete = async (id) => {
-    if (!confirm('Delete this case? This action cannot be undone.')) return;
+    if (!window.confirm('Are you sure you want to delete this case?')) return;
+    setError(''); setSuccess('');
     try {
       await caseService.deleteCase(id);
+      setCases((c) => c.filter((x) => x.id !== id));
       setSuccess('Case deleted');
-      load();
-    } catch (err) { setError(getErrorMessage(err)); }
+    } catch (err) {
+      setError(getErrorMessage(err));
+    }
   };
 
-  const filtered = search
-    ? cases.filter((c) => c.title?.toLowerCase().includes(search.toLowerCase()) || c.case_number?.toLowerCase().includes(search.toLowerCase()))
-    : cases;
+  const filtered = cases.filter((c) => {
+    if (!search.trim()) return true;
+    const q = search.toLowerCase();
+    return c.title?.toLowerCase().includes(q) || c.case_number?.toLowerCase().includes(q);
+  });
 
-  const totalPages = Math.ceil(total / PAGE_SIZE);
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   return (
     <div className="space-y-6">
-      {error && <Alert type="error" message={error} onClose={() => setError('')} />}
-      {success && <Alert type="success" message={success} onClose={() => setSuccess('')} />}
-
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="text-lg font-semibold text-white">Case Management</h2>
-          <p className="text-sm text-slate-400">{total} total cases · Active review queue</p>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Case Management</h1>
+          <p className="text-sm text-slate-600 dark:text-slate-400 font-medium">Track and manage active criminal & civil investigations</p>
         </div>
-        <Button onClick={() => setCreateOpen(true)} icon={<MdAdd size={18} />}>New Case</Button>
+        <Button onClick={() => setCreateOpen(true)} icon={<MdAdd size={18} />}>Create Case</Button>
       </div>
+
+      {error && <Alert type="error" message={error} onClose={() => setError('')} />}
+      {success && <Alert type="success" message={success} onClose={() => setSuccess('')} />}
 
       {/* Filters */}
       <Card>
         <div className="flex flex-col gap-3 sm:flex-row">
           <div className="relative flex-1">
-            <MdSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+            <MdSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" size={16} />
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search by title or case number..."
-              className="w-full rounded-2xl border border-white/10 bg-slate-950/60 py-2.5 pl-9 pr-4 text-sm text-slate-100 outline-none transition focus:border-blue-400/40"
+              className="w-full rounded-2xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950/80 py-2.5 pl-10 pr-4 text-sm text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
             />
           </div>
           <Select
@@ -187,9 +198,9 @@ export default function CasesPage() {
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-white/10">
+                  <tr className="border-b border-slate-200 dark:border-slate-800">
                     {['Case #', 'Title', 'Status', 'Location', 'Created', 'Actions'].map((h) => (
-                      <th key={h} className="text-left py-3 px-3 text-xs font-semibold text-slate-400 uppercase tracking-wider">{h}</th>
+                      <th key={h} className="text-left py-3 px-3 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{h}</th>
                     ))}
                   </tr>
                 </thead>
@@ -200,14 +211,14 @@ export default function CasesPage() {
                       initial={{ opacity: 0, x: -10 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: i * 0.03 }}
-                      className="border-b border-white/5 hover:bg-white/5 transition-colors"
+                      className="border-b border-slate-200 dark:border-slate-800/60 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors"
                     >
-                      <td className="py-3 px-3 font-mono text-xs text-blue-400">{c.case_number}</td>
+                      <td className="py-3 px-3 font-mono text-xs font-bold text-blue-600 dark:text-blue-400">{c.case_number}</td>
                       <td className="py-3 px-3">
                         <div>
-                          <p className="font-medium text-white">{truncate(c.title, 40)}</p>
+                          <p className="font-bold text-slate-900 dark:text-white">{truncate(c.title, 40)}</p>
                           {c.is_sensitive && (
-                            <span className="mt-1 inline-flex items-center gap-1 text-xs text-red-400">
+                            <span className="mt-1 inline-flex items-center gap-1 text-xs font-semibold text-red-600 dark:text-red-400">
                               <MdShield size={12} /> Sensitive
                             </span>
                           )}
@@ -216,17 +227,17 @@ export default function CasesPage() {
                       <td className="py-3 px-3">
                         <Badge className={statusColor(c.status)}>{statusLabel(c.status)}</Badge>
                       </td>
-                      <td className="py-3 px-3 text-slate-400">{c.location || '—'}</td>
-                      <td className="py-3 px-3 text-slate-400">{formatDate(c.created_at)}</td>
+                      <td className="py-3 px-3 text-slate-600 dark:text-slate-400 font-medium">{c.location || '—'}</td>
+                      <td className="py-3 px-3 text-slate-600 dark:text-slate-400 font-medium">{formatDate(c.created_at)}</td>
                       <td className="py-3 px-3">
                         <div className="flex items-center gap-1">
-                          <button onClick={() => setViewCase(c)} className="p-1.5 rounded-lg text-slate-400 hover:text-blue-400 hover:bg-blue-500/10 transition-colors">
+                          <button onClick={() => setViewCase(c)} className="p-1.5 rounded-lg text-slate-500 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-500/10 transition-colors" title="View Case">
                             <MdVisibility size={16} />
                           </button>
-                          <button onClick={() => setEditCase(c)} className="p-1.5 rounded-lg text-slate-400 hover:text-amber-400 hover:bg-amber-500/10 transition-colors">
+                          <button onClick={() => setEditCase(c)} className="p-1.5 rounded-lg text-slate-500 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-500/10 transition-colors" title="Edit Case">
                             <MdEdit size={16} />
                           </button>
-                          <button onClick={() => handleDelete(c.id)} className="p-1.5 rounded-lg text-red-500/60 hover:text-red-600 hover:bg-red-50 transition-all cursor-pointer">
+                          <button onClick={() => handleDelete(c.id)} className="p-1.5 rounded-lg text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-500/10 transition-all cursor-pointer" title="Delete Case">
                             <MdDelete size={16} />
                           </button>
                         </div>
@@ -239,8 +250,8 @@ export default function CasesPage() {
 
             {/* Pagination */}
             {totalPages > 1 && (
-              <div className="flex items-center justify-between mt-4 pt-4 border-t border-white/10">
-                <p className="text-xs text-slate-400">Page {page} of {totalPages}</p>
+              <div className="flex items-center justify-between mt-4 pt-4 border-t border-slate-200 dark:border-slate-800">
+                <p className="text-xs text-slate-500 font-medium">Page {page} of {totalPages}</p>
                 <div className="flex gap-2">
                   <Button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1} variant="secondary" size="sm">Previous</Button>
                   <Button onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={page === totalPages} variant="secondary" size="sm">Next</Button>
@@ -266,51 +277,51 @@ export default function CasesPage() {
         {viewCase && (
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <span className="font-mono text-blue-400 text-sm">{viewCase.case_number}</span>
+              <span className="font-mono text-blue-600 dark:text-blue-400 font-bold text-sm">{viewCase.case_number}</span>
               <Badge className={statusColor(viewCase.status)}>{statusLabel(viewCase.status)}</Badge>
             </div>
             <div>
-              <p className="text-xs text-slate-500 uppercase tracking-wider mb-1">Title</p>
-              <p className="text-white font-semibold">{viewCase.title}</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider mb-1">Title</p>
+              <p className="text-slate-900 dark:text-white font-bold">{viewCase.title}</p>
             </div>
             <div>
-              <p className="text-xs text-slate-500 uppercase tracking-wider mb-1">Description</p>
-              <p className="text-slate-300 text-sm leading-relaxed">{viewCase.description}</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider mb-1">Description</p>
+              <p className="text-slate-700 dark:text-slate-300 text-sm leading-relaxed font-medium">{viewCase.description}</p>
             </div>
             {viewCase.location && (
               <div>
-                <p className="text-xs text-slate-500 uppercase tracking-wider mb-1">Location</p>
-                <p className="text-slate-300 text-sm">{viewCase.location}</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider mb-1">Location</p>
+                <p className="text-slate-700 dark:text-slate-300 text-sm font-medium">{viewCase.location}</p>
               </div>
             )}
             {viewCase.applicable_sections?.length > 0 && (
               <div>
-                <p className="text-xs text-slate-500 uppercase tracking-wider mb-2">Applicable Sections</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider mb-2">Applicable Sections</p>
                 <div className="flex flex-wrap gap-2">
                   {viewCase.applicable_sections.map((s) => (
-                    <span key={s} className="text-xs px-2 py-1 rounded-lg bg-blue-500/20 text-blue-300">{s}</span>
+                    <span key={s} className="text-xs px-2.5 py-1 rounded-lg bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-500/20 font-bold">{s}</span>
                   ))}
                 </div>
               </div>
             )}
             {viewCase.tags?.length > 0 && (
               <div>
-                <p className="text-xs text-slate-500 uppercase tracking-wider mb-2">Tags</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider mb-2">Tags</p>
                 <div className="flex flex-wrap gap-2">
                   {viewCase.tags.map((t) => (
-                    <span key={t} className="text-xs px-2 py-1 rounded-lg bg-white/10 text-slate-300">{t}</span>
+                    <span key={t} className="text-xs px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold">{t}</span>
                   ))}
                 </div>
               </div>
             )}
-            <div className="grid grid-cols-2 gap-4 pt-2 border-t border-white/10">
+            <div className="grid grid-cols-2 gap-4 pt-2 border-t border-slate-200 dark:border-slate-800">
               <div>
-                <p className="text-xs text-slate-500">Created</p>
-                <p className="text-sm text-slate-300">{formatDate(viewCase.created_at)}</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400 font-bold">Created</p>
+                <p className="text-sm text-slate-800 dark:text-slate-300 font-medium">{formatDate(viewCase.created_at)}</p>
               </div>
               <div>
-                <p className="text-xs text-slate-500">Updated</p>
-                <p className="text-sm text-slate-300">{formatDate(viewCase.updated_at)}</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400 font-bold">Updated</p>
+                <p className="text-sm text-slate-800 dark:text-slate-300 font-medium">{formatDate(viewCase.updated_at)}</p>
               </div>
             </div>
           </div>

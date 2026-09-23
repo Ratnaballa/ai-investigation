@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
-import { MdMenu, MdNotifications, MdSearch, MdChevronRight } from 'react-icons/md';
+import { MdMenu, MdNotifications, MdSearch, MdChevronRight, MdWbSunny, MdNightsStay } from 'react-icons/md';
 import Sidebar from '../components/Sidebar';
 import { useAuthContext } from '../utils/AuthContext';
+import { useTheme } from '../utils/ThemeContext';
 
 const PAGE_TITLES = {
   '/dashboard': 'Dashboard',
@@ -19,49 +20,75 @@ export default function DashboardLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { pathname } = useLocation();
   const { user } = useAuthContext();
+  const { theme, toggleTheme, isDark } = useTheme();
 
   const title = PAGE_TITLES[pathname] || 'AI Investigation Assistant';
   const breadcrumb = pathname === '/dashboard' ? 'Command Center' : title;
 
   return (
-    <div className="flex h-screen overflow-hidden gradient-bg">
+    <div className="flex h-screen overflow-hidden bg-slate-50 dark:bg-slate-950 transition-colors">
       <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
       <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
-        <header className="flex-shrink-0 border-b border-white/10 bg-slate-950/40 px-4 py-3 backdrop-blur-xl lg:px-6">
+        <header className="flex-shrink-0 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 py-3 shadow-sm lg:px-6 transition-colors z-20">
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setSidebarOpen(true)}
-                className="rounded-2xl p-2 text-slate-400 transition hover:bg-white/10 hover:text-white lg:hidden"
+                className="rounded-xl p-2 text-slate-600 dark:text-slate-400 transition hover:bg-slate-100 dark:hover:bg-slate-800 lg:hidden"
               >
                 <MdMenu size={22} />
               </button>
               <div>
-                <div className="flex items-center gap-1.5 text-xs uppercase tracking-[0.26em] text-slate-400">
+                <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">
                   <span>AI Investigation Assistant</span>
                   <MdChevronRight size={14} />
                   <span>{breadcrumb}</span>
                 </div>
-                <h1 className="text-base font-semibold text-white">{title}</h1>
+                <h1 className="text-base font-bold text-slate-900 dark:text-white">{title}</h1>
               </div>
             </div>
 
             <div className="flex items-center gap-2">
-              <div className="hidden items-center gap-2 rounded-2xl border border-white/10 bg-slate-900/70 px-3 py-2 md:flex">
-                <MdSearch className="text-slate-400" size={16} />
+              <div className="hidden items-center gap-2 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 px-3 py-2 md:flex">
+                <MdSearch className="text-slate-400 dark:text-slate-500" size={16} />
                 <input
                   type="text"
                   placeholder="Quick search..."
-                  className="w-40 bg-transparent text-sm text-slate-200 outline-none placeholder:text-slate-500"
+                  className="w-40 bg-transparent text-sm text-slate-900 dark:text-slate-100 outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500"
                 />
               </div>
-              <button className="relative rounded-2xl border border-white/10 bg-slate-900/70 p-2 text-slate-400 transition hover:bg-white/10 hover:text-white">
-                <MdNotifications size={20} />
-                <span className="absolute right-1.5 top-1.5 h-2.5 w-2.5 rounded-full border border-slate-950 bg-blue-500" />
+
+              {/* Light / Dark Mode Switch Button */}
+              <button
+                onClick={toggleTheme}
+                className={`flex items-center gap-2 rounded-2xl border px-3 py-1.5 text-xs font-bold transition-all ${
+                  isDark
+                    ? 'border-slate-700 bg-slate-800 text-slate-100 hover:bg-slate-700'
+                    : 'border-slate-300 bg-slate-100 text-slate-800 hover:bg-slate-200 shadow-sm'
+                }`}
+                title={`Switch to ${isDark ? 'Light' : 'Dark'} Mode`}
+              >
+                {isDark ? (
+                  <>
+                    <MdWbSunny size={18} className="text-amber-400" />
+                    <span>Dark</span>
+                  </>
+                ) : (
+                  <>
+                    <MdNightsStay size={18} className="text-slate-700" />
+                    <span>Light</span>
+                  </>
+                )}
               </button>
+
+              <button className="relative rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/80 p-2 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+                <MdNotifications size={20} />
+                <span className="absolute right-1.5 top-1.5 h-2.5 w-2.5 rounded-full border border-white dark:border-slate-900 bg-blue-500" />
+              </button>
+
               {user && (
-                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-blue-600 to-purple-600 text-sm font-semibold text-white">
+                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 text-sm font-bold text-white shadow-sm">
                   {user.full_name?.charAt(0).toUpperCase()}
                 </div>
               )}
@@ -69,7 +96,7 @@ export default function DashboardLayout() {
           </div>
         </header>
 
-        <main className="flex-1 overflow-y-auto p-4 lg:p-6">
+        <main className="flex-1 overflow-y-auto p-4 lg:p-6 bg-slate-50 dark:bg-slate-950">
           <Outlet />
         </main>
       </div>

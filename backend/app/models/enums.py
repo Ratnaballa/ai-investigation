@@ -29,9 +29,15 @@ class NodeType(str, Enum):
     VICTIM = "victim"
     WITNESS = "witness"
     EVIDENCE = "evidence"
-    CASE = "case"
     LOCATION = "location"
     ORGANIZATION = "organization"
+    DEVICE = "device"
+    TRANSACTION = "transaction"
+    VEHICLE = "vehicle"
+    PHONE_NUMBER = "phone_number"
+    BANK_ACCOUNT = "bank_account"
+    OFFICER = "officer"
+    CASE = "case"
 
 
 class RelationshipType(str, Enum):

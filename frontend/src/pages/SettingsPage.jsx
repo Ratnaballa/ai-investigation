@@ -11,14 +11,14 @@ import { useAuthContext } from '../utils/AuthContext';
 
 function ToggleSwitch({ checked, onChange, label, description }) {
   return (
-    <div className="flex items-center justify-between py-3 border-b border-white/5 last:border-0">
+    <div className="flex items-center justify-between py-3 border-b border-slate-200 dark:border-slate-800 last:border-0">
       <div>
-        <p className="text-sm font-medium text-white">{label}</p>
-        {description && <p className="text-xs text-slate-400 mt-0.5">{description}</p>}
+        <p className="text-sm font-semibold text-slate-900 dark:text-white">{label}</p>
+        {description && <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">{description}</p>}
       </div>
       <button
         onClick={() => onChange(!checked)}
-        className={`relative w-11 h-6 rounded-full transition-colors duration-200 ${checked ? 'bg-blue-600' : 'bg-slate-600'}`}
+        className={`relative w-11 h-6 rounded-full transition-colors duration-200 cursor-pointer ${checked ? 'bg-blue-600' : 'bg-slate-300 dark:bg-slate-700'}`}
       >
         <span className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform duration-200 ${checked ? 'translate-x-5' : 'translate-x-0'}`} />
       </button>
@@ -54,7 +54,7 @@ export default function SettingsPage() {
 
   const sections = [
     {
-      icon: MdNotifications, title: 'Notifications', color: 'text-blue-400',
+      icon: MdNotifications, title: 'Notifications', color: 'text-blue-600 dark:text-blue-400',
       content: (
         <>
           <ToggleSwitch checked={settings.notifications.email} onChange={() => toggle('notifications', 'email')} label="Email Notifications" description="Receive updates via email" />
@@ -65,7 +65,7 @@ export default function SettingsPage() {
       ),
     },
     {
-      icon: MdSecurity, title: 'Security & Privacy', color: 'text-green-400',
+      icon: MdSecurity, title: 'Security & Privacy', color: 'text-emerald-600 dark:text-emerald-400',
       content: (
         <>
           <ToggleSwitch checked={settings.privacy.twoFactor} onChange={() => toggle('privacy', 'twoFactor')} label="Two-Factor Authentication" description="Add extra security to your account" />
@@ -87,7 +87,7 @@ export default function SettingsPage() {
       ),
     },
     {
-      icon: MdApi, title: 'AI Configuration', color: 'text-purple-400',
+      icon: MdApi, title: 'AI Configuration', color: 'text-purple-600 dark:text-purple-400',
       content: (
         <>
           <div className="py-3">
@@ -111,7 +111,7 @@ export default function SettingsPage() {
       ),
     },
     {
-      icon: MdPalette, title: 'Display', color: 'text-amber-400',
+      icon: MdPalette, title: 'Display', color: 'text-amber-600 dark:text-amber-400',
       content: (
         <>
           <ToggleSwitch checked={settings.display.compactMode} onChange={() => toggle('display', 'compactMode')} label="Compact Mode" description="Reduce spacing for more content" />
@@ -127,8 +127,8 @@ export default function SettingsPage() {
       <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}>
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-lg font-bold text-white">Settings</h2>
-            <p className="text-sm text-slate-400">Manage your preferences and configuration</p>
+            <h2 className="text-xl font-bold text-slate-900 dark:text-white">Settings</h2>
+            <p className="text-sm text-slate-600 dark:text-slate-400 font-medium">Manage your preferences and configuration</p>
           </div>
           <Button onClick={handleSave} icon={<MdSave size={16} />}>Save Settings</Button>
         </div>
@@ -139,8 +139,8 @@ export default function SettingsPage() {
       {/* System info */}
       <Card>
         <div className="flex items-center gap-3 mb-3">
-          <MdInfo className="text-blue-400" size={18} />
-          <h3 className="text-sm font-semibold text-white">System Information</h3>
+          <MdInfo className="text-blue-600 dark:text-blue-400" size={18} />
+          <h3 className="text-sm font-bold text-slate-900 dark:text-white">System Information</h3>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
           {[
@@ -151,9 +151,9 @@ export default function SettingsPage() {
             { label: 'User Role', value: user?.role || '—' },
             { label: 'Environment', value: 'Production' },
           ].map(({ label, value }) => (
-            <div key={label} className="p-3 rounded-xl bg-white/5">
-              <p className="text-xs text-slate-500">{label}</p>
-              <p className="text-sm text-white font-medium capitalize">{value}</p>
+            <div key={label} className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-800">
+              <p className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">{label}</p>
+              <p className="text-sm text-slate-900 dark:text-white font-bold capitalize mt-0.5">{value}</p>
             </div>
           ))}
         </div>
@@ -169,7 +169,7 @@ export default function SettingsPage() {
           <Card>
             <div className="flex items-center gap-2 mb-4">
               <Icon className={color} size={18} />
-              <h3 className="text-sm font-semibold text-white">{title}</h3>
+              <h3 className="text-sm font-bold text-slate-900 dark:text-white">{title}</h3>
             </div>
             {content}
           </Card>

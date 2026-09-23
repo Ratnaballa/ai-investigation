@@ -25,3 +25,14 @@ class GraphRelationshipRepository(BaseRepository):
 
     async def delete_by_case(self, case_id: str) -> int:
         return await self.delete_many({"case_id": case_id})
+
+
+class InvestigationGraphRepository(BaseRepository):
+    collection_name = "investigation_graphs"
+
+    async def find_by_case(self, case_id: str) -> dict:
+        return await self.find_one({"case_id": case_id})
+
+    async def delete_by_case(self, case_id: str) -> int:
+        return await self.delete_many({"case_id": case_id})
+

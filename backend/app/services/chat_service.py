@@ -25,24 +25,26 @@ class ChatService:
 
         # ── Ensure session exists ────────────────────────────────────────────
         session = await self.session_repo.find_user_session(session_id, user_id)
+        current_title = None
         if not session:
-            title = await self._generate_title_from_query(request.message)
+            current_title = await self._generate_title_from_query(request.message)
             await self.session_repo.insert_one({
                 "session_id": session_id,
                 "user_id": user_id,
-                "title": title,
+                "title": current_title,
                 "language": request.language,
                 "message_count": 0,
                 "is_active": True,
                 "last_message": request.message,
             })
         else:
-            # If session exists but has a placeholder title, update it
-            if session.get("title") == "New Investigation":
-                new_title = await self._generate_title_from_query(request.message)
+            current_title = session.get("title", "New Investigation")
+            # If session exists but has a placeholder title, update it once
+            if current_title == "New Investigation":
+                current_title = await self._generate_title_from_query(request.message)
                 await self.session_repo.collection.update_one(
                     {"session_id": session_id},
-                    {"$set": {"title": new_title}}
+                    {"$set": {"title": current_title}}
                 )
 
         # ── Persist user message ─────────────────────────────────────────────
@@ -90,10 +92,11 @@ class ChatService:
             "sources": structured.sources,
         })
 
+        structured.title = current_title
         await self.session_repo.update_session_activity(session_id, request.message)
         logger.info(
             f"[CHAT] Response sent | session={session_id} | user={user_id} "
-            f"| sections={len(structured.recommended_bns_sections)}"
+            f"| title='{current_title}' | sections={len(structured.recommended_bns_sections)}"
         )
         return structured
 
@@ -268,24 +271,36 @@ class ChatService:
                 {
                     "role": "system",
                     "content": (
-                        "You are a legal assistant. Generate a very short, concise, professional "
-                        "investigation title (maximum 3-4 words) from the user's first query. "
-                        "Do not include quotes, markdown formatting, or any extra text. "
-                        "Examples: 'Mobile Phone Theft', 'Cyber Fraud', 'Domestic Violence', "
-                        "'Cheque Bounce', 'Murder Investigation'."
+                        "You are a legal assistant. Generate a short, concise investigation title (3 to 5 words) "
+                        "from the user's message using formal case naming conventions. "
+                        "Do not include quotes, markdown, punctuation, or any extra explanatory text.\n\n"
+                        "Examples:\n"
+                        "User: Someone hacked into my bank account\nTitle: Cybercrime Investigation\n"
+                        "User: A mobile phone was stolen\nTitle: Mobile Theft Case\n"
+                        "User: Domestic violence complaint\nTitle: Domestic Violence Case"
                     )
                 },
                 {
                     "role": "user",
-                    "content": f"Query: {query}"
+                    "content": f"User message: {query}\nGenerate title:"
                 }
             ]
-            title = await self.grok.chat(messages, temperature=0.3, max_tokens=15)
-            cleaned_title = title.strip().replace('"', '').replace("'", "")
-            if len(cleaned_title) > 40:
-                cleaned_title = cleaned_title[:37] + "..."
-            return cleaned_title or "New Investigation"
+            raw_title = await self.grok.chat(messages, temperature=0.3, max_tokens=150)
+            cleaned_title = raw_title.strip().replace('"', '').replace("'", "").replace("`", "").strip()
+            if cleaned_title.lower().startswith("title:"):
+                cleaned_title = cleaned_title[6:].strip()
+            if len(cleaned_title) > 45:
+                cleaned_title = cleaned_title[:42] + "..."
+            if cleaned_title and cleaned_title != "New Investigation":
+                return cleaned_title
+
+            words = query.strip().split()
+            if len(words) >= 3:
+                return " ".join(words[:4]).title() + " Case"
+            return query[:30] + ("..." if len(query) > 30 else "")
         except Exception as exc:
             logger.warning(f"Failed to generate title using AI: {exc}")
-            # Fallback to simple truncation of the user's message
+            words = query.strip().split()
+            if len(words) >= 3:
+                return " ".join(words[:4]).title() + " Case"
             return query[:30] + ("..." if len(query) > 30 else "")

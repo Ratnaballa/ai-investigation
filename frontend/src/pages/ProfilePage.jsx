@@ -73,29 +73,29 @@ export default function ProfilePage() {
     <div className="max-w-3xl mx-auto space-y-6">
       {/* Profile header */}
       <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}>
-        <Card glow>
+        <Card>
           <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
             <div className="relative">
-              <div className="flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-to-br from-blue-600 to-purple-600 text-3xl font-bold text-white shadow-xl">
+              <div className="flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-to-br from-blue-600 to-indigo-600 text-3xl font-bold text-white shadow-lg">
                 {user.full_name?.charAt(0).toUpperCase()}
               </div>
               {user.is_verified && (
-                <div className="absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500">
+                <div className="absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500 shadow-sm">
                   <MdVerified className="text-white" size={14} />
                 </div>
               )}
             </div>
             <div className="flex-1">
-              <h2 className="text-xl font-semibold text-white">{user.full_name}</h2>
-              <p className="text-sm text-slate-400">{user.email}</p>
+              <h2 className="text-xl font-extrabold text-slate-900 dark:text-white">{user.full_name}</h2>
+              <p className="text-sm text-slate-600 dark:text-slate-400 font-medium">{user.email}</p>
               <div className="mt-2 flex flex-wrap items-center gap-2">
-                <span className={`status-badge ${roleBadgeColor(user.role)}`}>{roleLabel(user.role)}</span>
+                <span className={`status-badge text-xs font-semibold ${roleBadgeColor(user.role)}`}>{roleLabel(user.role)}</span>
                 {user.badge_number && (
-                  <span className="flex items-center gap-1 text-xs text-slate-400">
-                    <MdBadge size={12} /> {user.badge_number}
+                  <span className="flex items-center gap-1 text-xs text-slate-500 font-medium">
+                    <MdBadge size={14} /> {user.badge_number}
                   </span>
                 )}
-                <span className={`text-xs ${user.is_active ? 'text-emerald-400' : 'text-red-400'}`}>
+                <span className={`text-xs font-bold ${user.is_active ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-500'}`}>
                   ● {user.is_active ? 'Active' : 'Inactive'}
                 </span>
               </div>
@@ -113,8 +113,8 @@ export default function ProfilePage() {
 
       {/* Profile info / edit form */}
       <Card>
-        <h3 className="text-sm font-semibold text-white mb-4 flex items-center gap-2">
-          <MdPerson className="text-blue-400" size={18} /> Profile Information
+        <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+          <MdPerson className="text-blue-600 dark:text-blue-400" size={18} /> Profile Information
         </h3>
 
         {error && <div className="mb-4"><Alert type="error" message={error} onClose={() => setError('')} /></div>}
@@ -145,11 +145,11 @@ export default function ProfilePage() {
               { label: 'Member Since', value: formatDate(user.created_at), icon: MdPerson },
               { label: 'Account Status', value: user.is_active ? 'Active' : 'Inactive', icon: MdVerified },
             ].map(({ label, value, icon: Icon }) => (
-              <div key={label} className="flex items-start gap-3 p-3 rounded-xl bg-white/5">
-                <Icon className="text-blue-400 mt-0.5 flex-shrink-0" size={16} />
+              <div key={label} className="flex items-start gap-3 p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-800">
+                <Icon className="text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" size={16} />
                 <div>
-                  <p className="text-xs text-slate-500">{label}</p>
-                  <p className="text-sm text-white font-medium">{value}</p>
+                  <p className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">{label}</p>
+                  <p className="text-sm text-slate-900 dark:text-white font-bold mt-0.5">{value}</p>
                 </div>
               </div>
             ))}
@@ -159,8 +159,8 @@ export default function ProfilePage() {
 
       {/* Change password */}
       <Card>
-        <h3 className="text-sm font-semibold text-white mb-4 flex items-center gap-2">
-          <MdLock className="text-blue-400" size={18} /> Change Password
+        <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+          <MdLock className="text-blue-600 dark:text-blue-400" size={18} /> Change Password
         </h3>
 
         {pwError && <div className="mb-4"><Alert type="error" message={pwError} onClose={() => setPwError('')} /></div>}
@@ -172,8 +172,8 @@ export default function ProfilePage() {
             <Input label="New Password" type="password" value={pwForm.new_password} onChange={setPw('new_password')} placeholder="Min 8 chars" required icon={<MdLock size={16} />} />
             <Input label="Confirm New Password" type="password" value={pwForm.confirm} onChange={setPw('confirm')} placeholder="Repeat new password" required icon={<MdLock size={16} />} />
           </div>
-          <div className="p-3 rounded-xl bg-blue-500/10 border border-blue-500/20">
-            <p className="text-xs text-blue-300">Password must be at least 8 characters with uppercase, lowercase, digit, and special character.</p>
+          <div className="p-3 rounded-2xl bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20">
+            <p className="text-xs text-blue-800 dark:text-blue-300 font-medium">Password must be at least 8 characters with uppercase, lowercase, digit, and special character.</p>
           </div>
           <Button type="submit" loading={pwLoading} icon={<MdLock size={16} />}>Update Password</Button>
         </form>

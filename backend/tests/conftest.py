@@ -1,9 +1,3 @@
-"""
-pytest configuration
-====================
-Adds the backend root to sys.path so all app.* imports resolve correctly
-when running pytest from the backend/ directory.
-"""
 import sys
 from pathlib import Path
 

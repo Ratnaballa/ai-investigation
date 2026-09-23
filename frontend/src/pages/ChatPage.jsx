@@ -14,17 +14,17 @@ import { Spinner, Alert } from '../components/ui/index.jsx';
 function BNSCard({ section }) {
   const [open, setOpen] = useState(false);
   return (
-    <div className="overflow-hidden rounded-2xl border border-blue-500/20 bg-blue-500/10">
+    <div className="overflow-hidden rounded-2xl border border-blue-200 dark:border-blue-500/30 bg-blue-50/50 dark:bg-blue-500/10">
       <button
         onClick={() => setOpen(!open)}
-        className="flex w-full items-center justify-between p-3 text-left transition hover:bg-blue-500/10"
+        className="flex w-full items-center justify-between p-3 text-left transition hover:bg-blue-100/50 dark:hover:bg-blue-500/20"
       >
         <div className="flex items-center gap-2 min-w-0">
-          <MdGavel className="text-blue-400 flex-shrink-0" size={16} />
-          <span className="text-sm font-semibold text-blue-300 truncate">{section.section}</span>
-          <span className="text-xs text-slate-400 truncate hidden sm:block">— {section.title}</span>
+          <MdGavel className="text-blue-600 dark:text-blue-400 flex-shrink-0" size={16} />
+          <span className="text-sm font-semibold text-blue-900 dark:text-blue-300 truncate">{section.section}</span>
+          <span className="text-xs text-slate-600 dark:text-slate-400 truncate hidden sm:block">— {section.title}</span>
         </div>
-        {open ? <MdExpandLess className="text-slate-400 flex-shrink-0" size={18} /> : <MdExpandMore className="text-slate-400 flex-shrink-0" size={18} />}
+        {open ? <MdExpandLess className="text-slate-500 flex-shrink-0" size={18} /> : <MdExpandMore className="text-slate-500 flex-shrink-0" size={18} />}
       </button>
       <AnimatePresence>
         {open && (
@@ -32,10 +32,10 @@ function BNSCard({ section }) {
             initial={{ height: 0 }} animate={{ height: 'auto' }} exit={{ height: 0 }}
             className="overflow-hidden"
           >
-            <div className="px-3 pb-3 space-y-2 border-t border-blue-500/20">
-              <p className="text-xs text-slate-300 pt-2"><span className="text-slate-500">Description:</span> {section.description}</p>
-              <p className="text-xs text-red-300"><span className="text-slate-500">Punishment:</span> {section.punishment}</p>
-              <p className="text-xs text-green-300"><span className="text-slate-500">Relevance:</span> {section.relevance}</p>
+            <div className="px-3 pb-3 space-y-2 border-t border-blue-200 dark:border-blue-500/20">
+              <p className="text-xs text-slate-800 dark:text-slate-300 pt-2"><span className="font-semibold text-slate-500 dark:text-slate-400">Description:</span> {section.description}</p>
+              <p className="text-xs text-red-700 dark:text-red-300"><span className="font-semibold text-slate-500 dark:text-slate-400">Punishment:</span> {section.punishment}</p>
+              <p className="text-xs text-emerald-700 dark:text-emerald-300"><span className="font-semibold text-slate-500 dark:text-slate-400">Relevance:</span> {section.relevance}</p>
             </div>
           </motion.div>
         )}
@@ -47,14 +47,14 @@ function BNSCard({ section }) {
 function InvestigationStep({ step }) {
   return (
     <div className="flex gap-3">
-      <div className="flex-shrink-0 w-7 h-7 rounded-full bg-blue-600/30 border border-blue-500/40 flex items-center justify-center text-xs font-bold text-blue-300">
+      <div className="flex-shrink-0 w-7 h-7 rounded-full bg-blue-100 dark:bg-blue-600/30 border border-blue-300 dark:border-blue-500/40 flex items-center justify-center text-xs font-bold text-blue-700 dark:text-blue-300">
         {step.step}
       </div>
-      <div className="flex-1 pb-3 border-b border-white/5 last:border-0">
-        <p className="text-sm font-medium text-white">{step.action}</p>
+      <div className="flex-1 pb-3 border-b border-slate-200 dark:border-slate-800 last:border-0">
+        <p className="text-sm font-medium text-slate-900 dark:text-white">{step.action}</p>
         <div className="flex flex-wrap gap-3 mt-1">
-          <span className="text-xs text-slate-400">👤 {step.responsible}</span>
-          <span className="text-xs text-amber-400">⏱ {step.time_frame}</span>
+          <span className="text-xs text-slate-600 dark:text-slate-400">👤 {step.responsible}</span>
+          <span className="text-xs text-amber-700 dark:text-amber-400 font-medium">⏱ {step.time_frame}</span>
         </div>
       </div>
     </div>
@@ -69,18 +69,18 @@ function LegalResponsePanel({ response }) {
       className="mt-4 space-y-4"
     >
       {/* Case Summary */}
-      <div className="glass rounded-xl p-4">
-        <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-          <MdAssignment size={14} className="text-blue-400" /> Case Summary
+      <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-sm">
+        <h4 className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+          <MdAssignment size={14} className="text-blue-600 dark:text-blue-400" /> Case Summary
         </h4>
-        <p className="text-sm text-slate-200 leading-relaxed">{response.case_summary}</p>
+        <p className="text-sm text-slate-800 dark:text-slate-200 leading-relaxed">{response.case_summary}</p>
       </div>
 
       {/* BNS Sections */}
       {response.recommended_bns_sections?.length > 0 && (
-        <div className="glass rounded-xl p-4">
-          <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3 flex items-center gap-1.5">
-            <MdGavel size={14} className="text-blue-400" /> Recommended BNS Sections ({response.recommended_bns_sections.length})
+        <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-sm">
+          <h4 className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3 flex items-center gap-1.5">
+            <MdGavel size={14} className="text-blue-600 dark:text-blue-400" /> Recommended BNS Sections ({response.recommended_bns_sections.length})
           </h4>
           <div className="space-y-2">
             {response.recommended_bns_sections.map((s, i) => <BNSCard key={i} section={s} />)}
@@ -90,9 +90,9 @@ function LegalResponsePanel({ response }) {
 
       {/* Investigation Procedure */}
       {response.investigation_procedure?.length > 0 && (
-        <div className="glass rounded-xl p-4">
-          <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3 flex items-center gap-1.5">
-            <MdSearch size={14} className="text-blue-400" /> Investigation Procedure
+        <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-sm">
+          <h4 className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3 flex items-center gap-1.5">
+            <MdSearch size={14} className="text-blue-600 dark:text-blue-400" /> Investigation Procedure
           </h4>
           <div className="space-y-2">
             {response.investigation_procedure.map((s, i) => <InvestigationStep key={i} step={s} />)}
@@ -100,49 +100,33 @@ function LegalResponsePanel({ response }) {
         </div>
       )}
 
-      {/* Required Evidence */}
-      {response.required_evidence?.length > 0 && (
-        <div className="glass rounded-xl p-4">
-          <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3 flex items-center gap-1.5">
-            <MdShield size={14} className="text-blue-400" /> Required Evidence
-          </h4>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            {response.required_evidence.map((e, i) => (
-              <div key={i} className="flex items-start gap-2 text-sm text-slate-300">
-                <span className="text-blue-400 mt-0.5 flex-shrink-0">•</span>
-                {e}
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Legal Precautions */}
+      {/* Precautions */}
       {response.legal_precautions?.length > 0 && (
-        <div className="glass rounded-xl p-4">
-          <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3 flex items-center gap-1.5">
-            <MdWarning size={14} className="text-amber-400" /> Legal Precautions
+        <div className="rounded-2xl border border-amber-200 dark:border-amber-500/30 bg-amber-50/60 dark:bg-amber-500/10 p-4">
+          <h4 className="text-xs font-semibold text-amber-800 dark:text-amber-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+            <MdWarning size={14} /> Legal Precautions
           </h4>
-          <div className="space-y-2">
+          <ul className="space-y-1">
             {response.legal_precautions.map((p, i) => (
-              <div key={i} className="flex items-start gap-2 text-sm text-amber-200/80">
-                <span className="text-amber-400 mt-0.5 flex-shrink-0">⚠</span>
-                {p}
-              </div>
+              <li key={i} className="text-xs text-amber-900 dark:text-amber-200 flex items-start gap-1.5">
+                <span>•</span><span>{p}</span>
+              </li>
             ))}
-          </div>
+          </ul>
         </div>
       )}
 
       {/* Sources */}
       {response.sources?.length > 0 && (
-        <div className="glass rounded-xl p-4">
-          <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-            <MdSource size={14} className="text-blue-400" /> Sources
+        <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-sm">
+          <h4 className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+            <MdSource size={14} className="text-blue-600 dark:text-blue-400" /> Sources
           </h4>
-          <div className="space-y-1">
+          <div className="flex flex-wrap gap-2">
             {response.sources.map((s, i) => (
-              <p key={i} className="text-xs text-blue-400 hover:text-blue-300">{s}</p>
+              <span key={i} className="text-xs px-2.5 py-1 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-medium">
+                {s}
+              </span>
             ))}
           </div>
         </div>
@@ -159,152 +143,106 @@ export default function ChatPage() {
   const [loading, setLoading] = useState(false);
   const [sessionsLoading, setSessionsLoading] = useState(true);
   const [error, setError] = useState('');
-  const [lastResponse, setLastResponse] = useState(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState(null);
+
   const bottomRef = useRef(null);
   const inputRef = useRef(null);
 
+  const fetchSessions = async () => {
+    try {
+      const data = await chatService.getSessions();
+      setSessions(data.sessions || []);
+    } catch (err) {
+      setError(getErrorMessage(err));
+    } finally {
+      setSessionsLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const init = async () => {
-      setSessionsLoading(true);
-      try {
-        const data = await chatService.getSessions();
-        const loadedSessions = data.sessions || data.items || [];
-        setSessions(loadedSessions);
-        if (loadedSessions.length > 0) {
-          loadSession(loadedSessions[0].id);
-        }
-      } catch {}
-      finally { setSessionsLoading(false); }
-    };
-    init();
+    fetchSessions();
   }, []);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, loading]);
 
-  const loadSessions = async () => {
-    setSessionsLoading(true);
-    try {
-      const data = await chatService.getSessions();
-      setSessions(data.sessions || data.items || []);
-    } catch {}
-    finally { setSessionsLoading(false); }
-  };
-
   const loadSession = async (sessionId) => {
     setActiveSession(sessionId);
-    setLastResponse(null);
+    setLoading(true);
+    setError('');
     try {
-      const data = await chatService.getSessionHistory(sessionId);
-      const msgs = (data.messages || []).map((m) => {
-        if (m.role === 'assistant') {
-          try {
-            const parsed = JSON.parse(m.content);
-            return {
-              role: 'assistant',
-              content: parsed.case_summary || 'Analysis complete. See structured response below.',
-              time: m.created_at,
-              isStructured: true,
-              response: parsed,
-            };
-          } catch (e) {
-            return {
-              role: 'assistant',
-              content: m.content,
-              time: m.created_at,
-            };
-          }
-        }
-        return {
-          role: 'user',
-          content: m.content,
-          time: m.created_at,
-        };
-      });
-      setMessages(msgs);
-    } catch {}
-  };
-
-  const newChat = async () => {
-    try {
-      const newSession = await chatService.createSession();
-      setSessions((prev) => [newSession, ...prev]);
-      setActiveSession(newSession.id);
-      setMessages([]);
-      setLastResponse(null);
-      setError('');
-      setTimeout(() => {
-        inputRef.current?.focus();
-      }, 0);
+      const data = await chatService.getHistory(sessionId);
+      const formatted = (data.messages || []).map((m) => ({
+        role: m.role,
+        content: m.content,
+        time: m.created_at,
+        isStructured: !!m.structured_response,
+        response: m.structured_response || null,
+      }));
+      setMessages(formatted);
     } catch (err) {
       setError(getErrorMessage(err));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const newChat = () => {
+    setActiveSession(null);
+    setMessages([]);
+    setInput('');
+    setError('');
+    inputRef.current?.focus();
+  };
+
+  const sendMessage = async (e) => {
+    e.preventDefault();
+    const q = input.trim();
+    if (!q || loading) return;
+
+    setInput('');
+    const userMsg = { role: 'user', content: q, time: new Date().toISOString() };
+    setMessages((prev) => [...prev, userMsg]);
+    setLoading(true);
+    setError('');
+
+    try {
+      const data = await chatService.sendMessage(q, activeSession);
+
+      if (!activeSession && data.session_id) {
+        setActiveSession(data.session_id);
+        fetchSessions();
+      }
+
+      const aiMsg = {
+        role: 'assistant',
+        content: data.response?.case_summary || data.reply || 'Legal analysis generated.',
+        time: new Date().toISOString(),
+        isStructured: true,
+        response: data.response || null,
+      };
+      setMessages((prev) => [...prev, aiMsg]);
+    } catch (err) {
+      setError(getErrorMessage(err));
+    } finally {
+      setLoading(false);
     }
   };
 
   const deleteSession = async (id) => {
     try {
       await chatService.deleteSession(id);
-      const remaining = sessions.filter((x) => x.id !== id);
-      setSessions(remaining);
-      if (activeSession === id) {
-        if (remaining.length > 0) {
-          loadSession(remaining[0].id);
-        } else {
-          await newChat();
-        }
-      }
+      setSessions((s) => s.filter((x) => x.id !== id));
+      if (activeSession === id) newChat();
     } catch (err) {
       setError(getErrorMessage(err));
-    }
-  };
-
-  const sendMessage = async (e) => {
-    e.preventDefault();
-    if (!input.trim() || loading) return;
-    const text = input.trim();
-    setInput('');
-    setError('');
-    setMessages((m) => [...m, { role: 'user', content: text, time: new Date().toISOString() }]);
-    setLoading(true);
-
-    try {
-      const res = await chatService.sendMessage(text, activeSession);
-      if (!activeSession) {
-        setActiveSession(res.session_id);
-        loadSessions();
-      } else {
-        setSessions((prev) => {
-          const updated = prev.map((s) =>
-            s.id === activeSession
-              ? { ...s, last_message: text, updated_at: new Date().toISOString() }
-              : s
-          );
-          return [...updated].sort(
-            (a, b) => new Date(b.updated_at || b.created_at) - new Date(a.updated_at || a.created_at)
-          );
-        });
-      }
-      setLastResponse(res);
-      setMessages((m) => [...m, {
-        role: 'assistant',
-        content: res.case_summary || 'Analysis complete. See structured response below.',
-        time: new Date().toISOString(),
-        isStructured: true,
-        response: res,
-      }]);
-    } catch (err) {
-      setError(getErrorMessage(err));
-      setMessages((m) => m.slice(0, -1));
-    } finally {
-      setLoading(false);
     }
   };
 
   const SUGGESTIONS = [
-    'A person was caught stealing a mobile phone worth Rs 15,000 from a shop.',
-    'Cybercrime: Someone hacked into a bank account and transferred Rs 2 lakhs.',
+    'Theft of motor vehicle from parking area at night.',
+    'Cyber fraud — unauthorized Rs 2 lakh bank transfer via phishing.',
     'Domestic violence case — wife filed complaint against husband.',
     'Murder case — body found with stab wounds in a residential area.',
   ];
@@ -312,8 +250,8 @@ export default function ChatPage() {
   return (
     <div className="flex h-[calc(100vh-5rem)] gap-4">
       {/* Sessions sidebar */}
-      <div className="hidden w-72 flex-shrink-0 flex-col overflow-hidden rounded-[24px] border border-white/10 bg-slate-950/50 md:flex">
-        <div className="border-b border-white/10 p-3">
+      <div className="hidden w-72 flex-shrink-0 flex-col overflow-hidden rounded-[24px] border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 md:flex shadow-sm">
+        <div className="border-b border-slate-200 dark:border-slate-800 p-3">
           <Button onClick={newChat} className="w-full" size="sm" icon={<MdAdd size={16} />}>
             New Investigation
           </Button>
@@ -330,22 +268,22 @@ export default function ChatPage() {
                 <div
                   key={s.id}
                   onClick={() => loadSession(s.id)}
-                  className={`group relative mb-2 flex flex-col gap-1.5 rounded-2xl p-3 text-left transition-all duration-300 cursor-pointer border ${
+                  className={`group relative mb-2 flex flex-col gap-1.5 rounded-2xl p-3 text-left transition-all duration-200 cursor-pointer border ${
                     isActive
-                      ? 'bg-gradient-to-r from-blue-500/15 to-purple-500/15 border-blue-500/40 text-blue-100 shadow-md shadow-blue-500/5'
-                      : 'border-transparent bg-white/0 text-slate-400 hover:bg-white/[0.04] hover:text-white hover:border-white/5'
+                      ? 'bg-blue-50 dark:bg-blue-500/15 border-blue-300 dark:border-blue-500/40 text-blue-900 dark:text-blue-100 shadow-sm'
+                      : 'border-transparent text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white'
                   }`}
                 >
                   {/* Active Indicator Bar */}
                   {isActive && (
-                    <div className="absolute left-0 top-3 bottom-3 w-1 rounded-r-md bg-blue-500" />
+                    <div className="absolute left-0 top-3 bottom-3 w-1 rounded-r-md bg-blue-600 dark:bg-blue-500" />
                   )}
 
                   {/* Header: Title and Delete icon */}
                   <div className="flex items-start justify-between gap-2 min-w-0">
                     <div className="flex items-center gap-2 min-w-0">
-                      <MdChat size={14} className={`flex-shrink-0 ${isActive ? 'text-blue-400' : 'text-slate-500'}`} />
-                      <span className={`text-xs font-semibold truncate ${isActive ? 'text-blue-100' : 'text-slate-300'}`}>
+                      <MdChat size={14} className={`flex-shrink-0 ${isActive ? 'text-blue-600 dark:text-blue-400' : 'text-slate-400'}`} />
+                      <span className={`text-xs font-semibold truncate ${isActive ? 'text-blue-900 dark:text-blue-100' : 'text-slate-700 dark:text-slate-300'}`}>
                         {s.title || 'New Investigation'}
                       </span>
                     </div>
@@ -355,24 +293,24 @@ export default function ChatPage() {
                         e.stopPropagation();
                         setDeleteConfirmId(s.id);
                       }}
-                      className="rounded p-1 text-red-500/60 hover:text-red-600 hover:bg-red-50 transition-all cursor-pointer opacity-100"
+                      className="rounded p-1 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-500/20 transition-all cursor-pointer"
                     >
                       <MdDelete size={14} />
                     </button>
                   </div>
 
                   {/* Last message preview */}
-                  <p className={`text-[11px] truncate px-5 ${isActive ? 'text-blue-200/60' : 'text-slate-500 group-hover:text-slate-400'}`}>
+                  <p className={`text-[11px] truncate px-5 ${isActive ? 'text-blue-700 dark:text-blue-200' : 'text-slate-500'}`}>
                     {s.last_message || 'No messages yet'}
                   </p>
 
                   {/* Footer: Time */}
                   <div className="flex items-center justify-between px-5 mt-0.5">
-                    <span className="text-[10px] text-slate-600 group-hover:text-slate-500 font-mono">
+                    <span className="text-[10px] text-slate-500 dark:text-slate-400 font-mono">
                       {s.updated_at ? formatDateTime(s.updated_at) : formatDateTime(s.created_at)}
                     </span>
                     {isActive && (
-                      <span className="text-[9px] font-semibold tracking-wider text-blue-400 uppercase">Active</span>
+                      <span className="text-[9px] font-bold tracking-wider text-blue-600 dark:text-blue-400 uppercase">Active</span>
                     )}
                   </div>
                 </div>
@@ -383,16 +321,16 @@ export default function ChatPage() {
       </div>
 
       {/* Main chat area */}
-      <div className="flex min-w-0 flex-1 flex-col overflow-hidden rounded-[24px] border border-white/10 bg-slate-950/55">
+      <div className="flex min-w-0 flex-1 flex-col overflow-hidden rounded-[24px] border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
+        <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 px-4 py-3">
           <div className="flex items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600">
-              <MdSmartToy className="text-white" size={16} />
+            <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 text-white shadow-sm">
+              <MdSmartToy size={18} />
             </div>
             <div>
-              <p className="text-sm font-semibold text-white">CaseMind AI</p>
-              <p className="text-xs text-emerald-400">● Online</p>
+              <p className="text-sm font-bold text-slate-900 dark:text-white">CaseMind AI</p>
+              <p className="text-xs text-emerald-600 dark:text-emerald-400 font-semibold">● Online</p>
             </div>
           </div>
           <Button onClick={newChat} variant="secondary" size="sm" icon={<MdAdd size={14} />}>
@@ -401,14 +339,14 @@ export default function ChatPage() {
         </div>
 
         {/* Messages */}
-        <div className="flex-1 space-y-4 overflow-y-auto p-4">
+        <div className="flex-1 space-y-4 overflow-y-auto p-4 bg-slate-50/50 dark:bg-slate-950/40">
           {messages.length === 0 && !loading && (
             <div className="flex h-full flex-col items-center justify-center py-8 text-center">
-              <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl border border-blue-500/20 bg-gradient-to-br from-blue-500/20 to-purple-500/20">
-                <MdGavel className="text-blue-400" size={28} />
+              <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl border border-blue-200 dark:border-blue-500/20 bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400">
+                <MdGavel size={32} />
               </div>
-              <h3 className="mb-2 text-lg font-semibold text-white">AI Legal Assistant</h3>
-              <p className="mb-6 max-w-md text-sm text-slate-400">
+              <h3 className="mb-2 text-lg font-bold text-slate-900 dark:text-white">AI Legal Assistant</h3>
+              <p className="mb-6 max-w-md text-sm text-slate-600 dark:text-slate-400">
                 Describe a legal case or situation to get structured analysis with applicable BNS/IPC sections, investigation procedure, and legal precautions.
               </p>
               <div className="grid w-full max-w-lg grid-cols-1 gap-2 sm:grid-cols-2">
@@ -416,7 +354,7 @@ export default function ChatPage() {
                   <button
                     key={i}
                     onClick={() => setInput(s)}
-                    className="rounded-2xl border border-white/10 bg-slate-900/60 p-3 text-left text-xs text-slate-300 transition hover:bg-white/10 hover:text-white"
+                    className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 p-3 text-left text-xs font-medium text-slate-700 dark:text-slate-300 shadow-sm transition hover:border-blue-300 hover:bg-blue-50 dark:hover:bg-slate-700 dark:hover:text-white"
                   >
                     {s}
                   </button>
@@ -433,12 +371,16 @@ export default function ChatPage() {
               className={`flex gap-3 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
             >
               {msg.role === 'assistant' && (
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center flex-shrink-0 mt-1">
-                  <MdSmartToy className="text-white" size={14} />
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center flex-shrink-0 mt-1 text-white shadow-sm">
+                  <MdSmartToy size={16} />
                 </div>
               )}
               <div className={`max-w-[85%] ${msg.role === 'user' ? 'items-end' : 'items-start'} flex flex-col`}>
-                <div className={`px-4 py-3 text-sm leading-relaxed ${msg.role === 'user' ? 'chat-bubble-user text-white' : 'chat-bubble-ai text-slate-200'}`}>
+                <div className={`px-4 py-3 text-sm leading-relaxed rounded-2xl ${
+                  msg.role === 'user'
+                    ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-medium shadow-sm'
+                    : 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 shadow-sm'
+                }`}>
                   {msg.content}
                 </div>
                 {msg.isStructured && msg.response && (
@@ -446,11 +388,11 @@ export default function ChatPage() {
                     <LegalResponsePanel response={msg.response} />
                   </div>
                 )}
-                <span className="text-xs text-slate-600 mt-1 px-1">{formatDateTime(msg.time)}</span>
+                <span className="text-xs text-slate-500 dark:text-slate-400 mt-1 px-1 font-mono">{formatDateTime(msg.time)}</span>
               </div>
               {msg.role === 'user' && (
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-slate-600 to-slate-700 flex items-center justify-center flex-shrink-0 mt-1">
-                  <MdPerson className="text-white" size={14} />
+                <div className="w-8 h-8 rounded-full bg-slate-700 text-white flex items-center justify-center flex-shrink-0 mt-1 shadow-sm">
+                  <MdPerson size={16} />
                 </div>
               )}
             </motion.div>
@@ -458,15 +400,15 @@ export default function ChatPage() {
 
           {loading && (
             <div className="flex gap-3 justify-start">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center flex-shrink-0">
-                <MdSmartToy className="text-white" size={14} />
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center flex-shrink-0 text-white">
+                <MdSmartToy size={16} />
               </div>
-              <div className="chat-bubble-ai flex items-center gap-2 px-4 py-3">
-                <div className="rounded-full border border-cyan-400/20 bg-cyan-500/10 p-1.5">
-                  <MdAutoAwesome className="text-cyan-300" size={14} />
+              <div className="rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center gap-2 px-4 py-3 shadow-sm">
+                <div className="rounded-full bg-blue-50 dark:bg-blue-500/10 p-1.5 text-blue-600 dark:text-blue-400">
+                  <MdAutoAwesome size={14} />
                 </div>
                 <Spinner size="sm" />
-                <span className="text-sm text-slate-400">Analysing legal query...</span>
+                <span className="text-sm text-slate-600 dark:text-slate-400 font-medium">Analysing legal query...</span>
               </div>
             </div>
           )}
@@ -482,7 +424,7 @@ export default function ChatPage() {
         )}
 
         {/* Input */}
-        <form onSubmit={sendMessage} className="border-t border-white/10 p-4">
+        <form onSubmit={sendMessage} className="border-t border-slate-200 dark:border-slate-800 p-4 bg-white dark:bg-slate-900">
           <div className="flex flex-col gap-2 sm:flex-row">
             <textarea
               ref={inputRef}
@@ -491,7 +433,7 @@ export default function ChatPage() {
               onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(e); } }}
               placeholder="Describe a legal case or ask a legal question... (Enter to send, Shift+Enter for new line)"
               rows={2}
-              className="flex-1 resize-none rounded-2xl border border-white/10 bg-slate-900/70 px-4 py-3 text-sm text-slate-100 outline-none transition focus:border-blue-400/40"
+              className="flex-1 resize-none rounded-2xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 px-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
             />
             <Button
               type="submit"
@@ -509,15 +451,15 @@ export default function ChatPage() {
       {/* Confirmation Dialog */}
       <AnimatePresence>
         {deleteConfirmId && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 dark:bg-slate-950/80">
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="w-full max-w-sm rounded-[24px] border border-white/10 bg-slate-900 p-6 shadow-2xl"
+              className="w-full max-w-sm rounded-[24px] border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-2xl"
             >
-              <h3 className="mb-2 text-lg font-bold text-white">Delete Investigation?</h3>
-              <p className="mb-6 text-sm text-slate-400">
+              <h3 className="mb-2 text-lg font-bold text-slate-900 dark:text-white">Delete Investigation?</h3>
+              <p className="mb-6 text-sm text-slate-600 dark:text-slate-400">
                 This will permanently delete this conversation and all associated messages. This action cannot be undone.
               </p>
               <div className="flex justify-end gap-3">

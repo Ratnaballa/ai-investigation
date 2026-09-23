@@ -53,6 +53,10 @@ class LegalChatResponse(BaseModel):
     Every field maps directly to the required response format.
     """
     session_id: str = Field(..., description="Session ID for this conversation")
+    title: Optional[str] = Field(
+        default=None,
+        description="Generated or current title of the investigation session",
+    )
     case_summary: str = Field(
         ...,
         description="Concise summary of the case / legal situation described",

@@ -20,10 +20,10 @@ const REPORT_TYPES = [
 ];
 
 const TYPE_COLORS = {
-  investigation: 'bg-blue-500/20 text-blue-300 border-blue-500/30',
-  legal_analysis: 'bg-purple-500/20 text-purple-300 border-purple-500/30',
-  evidence_summary: 'bg-amber-500/20 text-amber-300 border-amber-500/30',
-  case_summary: 'bg-green-500/20 text-green-300 border-green-500/30',
+  investigation: 'bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-500/20 dark:text-blue-300 dark:border-blue-500/30',
+  legal_analysis: 'bg-purple-100 text-purple-800 border-purple-200 dark:bg-purple-500/20 dark:text-purple-300 dark:border-purple-500/30',
+  evidence_summary: 'bg-amber-100 text-amber-800 border-amber-200 dark:bg-amber-500/20 dark:text-amber-300 dark:border-amber-500/30',
+  case_summary: 'bg-emerald-100 text-emerald-800 border-emerald-200 dark:bg-emerald-500/20 dark:text-emerald-300 dark:border-emerald-500/30',
 };
 
 export default function ReportsPage() {
@@ -46,7 +46,6 @@ export default function ReportsPage() {
     setError('');
     try {
       const data = await reportService.getReports();
-      // Sort newest first
       const items = (data.items || []).sort(
         (a, b) => new Date(b.created_at) - new Date(a.created_at)
       );
@@ -101,140 +100,122 @@ export default function ReportsPage() {
   const confirmDelete = async () => {
     const id = deleteConfirmId;
     setDeleteConfirmId(null);
-    setLoading(true);
     setError('');
     setSuccess('');
     try {
       await reportService.deleteReport(id);
       setReports((r) => r.filter((x) => x.id !== id));
+      if (viewReport?.id === id) setViewReport(null);
       setSuccess('Report deleted successfully');
     } catch (err) {
       setError(getErrorMessage(err));
-    } finally {
-      setLoading(false);
     }
   };
 
-  const filtered = search
-    ? reports.filter((r) =>
-        r.title?.toLowerCase().includes(search.toLowerCase()) ||
-        r.case_id?.toLowerCase().includes(search.toLowerCase()) ||
-        r.report_type?.toLowerCase().includes(search.toLowerCase())
-      )
-    : reports;
-
-  const stats = REPORT_TYPES.map((t) => ({
-    ...t,
-    count: reports.filter((r) => r.report_type === t.value).length,
-  }));
+  const filtered = reports.filter((r) => {
+    if (!search.trim()) return true;
+    const q = search.toLowerCase();
+    return (
+      r.title?.toLowerCase().includes(q) ||
+      r.report_type?.toLowerCase().includes(q) ||
+      r.case_id?.toLowerCase().includes(q)
+    );
+  });
 
   return (
     <div className="space-y-6">
-      {error && <Alert type="error" message={error} onClose={() => setError('')} />}
-      {success && <Alert type="success" message={success} onClose={() => setSuccess('')} />}
-
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="text-lg font-semibold text-white">Reports</h2>
-          <p className="text-sm text-slate-400">{reports.length} reports generated · Ready for review</p>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Reports Library</h1>
+          <p className="text-sm text-slate-600 dark:text-slate-400 font-medium">Generate, export, and manage official AI investigation reports</p>
         </div>
-        <Button onClick={() => setGenerateOpen(true)} icon={<MdAdd size={18} />}>Generate Report</Button>
+        <Button onClick={() => setGenerateOpen(true)} icon={<MdAdd size={18} />}>
+          Generate Report
+        </Button>
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {stats.map((s, i) => (
-          <motion.div
-            key={s.value}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.05 }}
-            className="premium-card rounded-2xl border border-white/10 p-4"
-          >
-            <p className="text-2xl font-semibold text-white">{s.count}</p>
-            <p className="mt-1 text-xs uppercase tracking-[0.24em] text-slate-400">{s.label}</p>
-          </motion.div>
-        ))}
-      </div>
+      {error && <Alert type="error" message={error} onClose={() => setError('')} />}
+      {success && <Alert type="success" message={success} onClose={() => setSuccess('')} />}
 
-      {/* Search & list */}
+      {/* Filter / Search Bar */}
       <Card>
-        <div className="flex gap-3 mb-4">
-          <div className="flex-1 relative">
-            <MdSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+        <div className="flex flex-col gap-3 sm:flex-row">
+          <div className="relative flex-1">
+            <MdSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" size={16} />
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search reports by title, case ID, or type..."
-              className="w-full input-glass rounded-xl pl-9 pr-4 py-2.5 text-sm"
+              placeholder="Search reports by title, type, or case ID..."
+              className="w-full rounded-2xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950/80 py-2.5 pl-10 pr-4 text-sm text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
             />
           </div>
-          <Button onClick={load} variant="secondary" icon={<MdRefresh size={16} />}>Refresh</Button>
+          <Button onClick={load} variant="secondary" icon={<MdRefresh size={16} />}>
+            Refresh
+          </Button>
         </div>
+      </Card>
 
+      {/* Reports List */}
+      <Card>
         {loading ? (
           <div className="flex justify-center py-16"><Spinner size="lg" /></div>
-        ) : reports.length === 0 ? (
-          <EmptyState
-            icon={<MdAssessment className="text-slate-500" />}
-            title="No Reports Generated Yet"
-            description="Create or generate your first professional legal report to begin."
-            action={<Button onClick={() => setGenerateOpen(true)} icon={<MdAdd size={16} />}>Generate First Report</Button>}
-          />
         ) : filtered.length === 0 ? (
           <EmptyState
-            icon={<MdAssessment className="text-slate-500" />}
-            title="No reports match search"
-            description="Try adjusting your keywords."
-            action={<Button onClick={() => setSearch('')}>Clear Search</Button>}
+            icon={<MdAssessment />}
+            title="No reports found"
+            description="Generate an AI report for an ongoing case or investigation."
+            action={<Button onClick={() => setGenerateOpen(true)} icon={<MdAdd size={16} />}>Generate Report</Button>}
           />
         ) : (
-          <div className="space-y-2">
+          <div className="grid grid-cols-1 gap-3">
             {filtered.map((r, i) => (
               <motion.div
                 key={r.id}
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: i * 0.04 }}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.03 }}
                 onClick={() => handleOpenReport(r.id)}
-                className="flex items-center justify-between rounded-2xl border border-white/10 bg-slate-900/50 p-4 transition hover:bg-white/5 cursor-pointer"
+                className="flex items-center justify-between rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 p-4 transition hover:bg-slate-100 dark:hover:bg-slate-800/60 cursor-pointer shadow-sm"
               >
                 <div className="flex items-center gap-3 min-w-0">
-                  <div className="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center flex-shrink-0">
-                    <MdAssessment className="text-blue-400" size={18} />
+                  <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-500/10 flex items-center justify-center flex-shrink-0 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-500/20">
+                    <MdAssessment size={20} />
                   </div>
                   <div className="min-w-0">
-                    <p className="text-sm font-medium text-white truncate">{r.title}</p>
-                    <div className="flex items-center gap-2 mt-0.5">
-                      <Badge className={`${TYPE_COLORS[r.report_type]} border`}>
+                    <p className="text-sm font-bold text-slate-900 dark:text-white truncate">{r.title}</p>
+                    <div className="flex flex-wrap items-center gap-2 mt-1">
+                      <Badge className={`${TYPE_COLORS[r.report_type] || TYPE_COLORS.investigation} border`}>
                         {REPORT_TYPES.find((t) => t.value === r.report_type)?.label || r.report_type}
                       </Badge>
                       {r.case_id && (
-                        <span className="text-xs text-blue-400 font-mono font-medium">Case: {r.case_id}</span>
+                        <span className="text-xs text-blue-600 dark:text-blue-400 font-mono font-bold">Case: {r.case_id}</span>
                       )}
-                      <span className="text-xs text-slate-500">• {formatDateTime(r.created_at)}</span>
+                      <span className="text-xs text-slate-500 font-medium">• {formatDateTime(r.created_at)}</span>
                     </div>
                   </div>
                 </div>
                 <div className="flex items-center gap-1 flex-shrink-0 ml-2" onClick={(e) => e.stopPropagation()}>
                   <button
                     onClick={() => handleOpenReport(r.id)}
-                    className="p-1.5 rounded-lg text-slate-400 hover:text-blue-400 hover:bg-blue-500/10 transition-colors cursor-pointer"
+                    className="p-1.5 rounded-lg text-slate-500 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-500/10 transition-colors cursor-pointer"
+                    title="View Report Details"
                   >
-                    <MdVisibility size={16} />
+                    <MdVisibility size={18} />
                   </button>
                   <button
                     onClick={() => generateReportPDF(r)}
-                    className="p-1.5 rounded-lg text-slate-400 hover:text-green-400 hover:bg-green-500/10 transition-colors cursor-pointer"
+                    className="p-1.5 rounded-lg text-slate-500 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 transition-colors cursor-pointer"
+                    title="Download PDF"
                   >
-                    <MdDownload size={16} />
+                    <MdDownload size={18} />
                   </button>
                   <button
                     onClick={(e) => handleDeleteClick(r.id, e)}
-                    className="p-1.5 rounded-lg text-red-500/60 hover:text-red-600 hover:bg-red-50 transition-all cursor-pointer"
+                    className="p-1.5 rounded-lg text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-500/10 transition-all cursor-pointer"
+                    title="Delete Report"
                   >
-                    <MdDelete size={16} />
+                    <MdDelete size={18} />
                   </button>
                 </div>
               </motion.div>
@@ -258,21 +239,21 @@ export default function ReportsPage() {
         {viewLoading && (
           <div className="space-y-4 animate-pulse p-4">
             <div className="flex justify-between items-center">
-              <div className="h-6 bg-white/10 rounded w-24"></div>
-              <div className="h-4 bg-white/10 rounded w-32"></div>
+              <div className="h-6 bg-slate-200 dark:bg-slate-800 rounded w-24"></div>
+              <div className="h-4 bg-slate-200 dark:bg-slate-800 rounded w-32"></div>
             </div>
-            <div className="h-8 bg-white/10 rounded w-2/3"></div>
+            <div className="h-8 bg-slate-200 dark:bg-slate-800 rounded w-2/3"></div>
             <div className="grid grid-cols-2 gap-4">
-              <div className="h-12 bg-white/10 rounded-xl"></div>
-              <div className="h-12 bg-white/10 rounded-xl"></div>
+              <div className="h-12 bg-slate-200 dark:bg-slate-800 rounded-xl"></div>
+              <div className="h-12 bg-slate-200 dark:bg-slate-800 rounded-xl"></div>
             </div>
-            <div className="h-40 bg-white/10 rounded-xl"></div>
+            <div className="h-40 bg-slate-200 dark:bg-slate-800 rounded-xl"></div>
           </div>
         )}
         {viewReport && !viewLoading && (
           <div className="space-y-6">
             {/* Top Action Bar inside Modal */}
-            <div className="flex justify-end gap-3 border-b border-white/10 pb-4">
+            <div className="flex justify-end gap-3 border-b border-slate-200 dark:border-slate-800 pb-4">
               <Button onClick={() => window.print()} variant="secondary" icon={<MdVisibility size={16} />}>
                 Print Report
               </Button>
@@ -284,7 +265,7 @@ export default function ReportsPage() {
             {/* Virtual Page Printable Container */}
             <div
               id="printable-report-area"
-              className="bg-white text-slate-800 p-8 rounded-[16px] border border-slate-200 shadow-xl max-h-[60vh] overflow-y-auto font-sans leading-relaxed"
+              className="bg-white text-slate-900 p-8 rounded-[16px] border border-slate-200 shadow-xl max-h-[60vh] overflow-y-auto font-sans leading-relaxed"
             >
               {/* Report Header */}
               <div className="border-b-2 border-slate-900 pb-6 mb-6">
@@ -303,7 +284,7 @@ export default function ReportsPage() {
                     <span className="inline-block px-2.5 py-1 rounded bg-slate-900 text-white text-[9px] font-bold uppercase tracking-wider">
                       {(viewReport.report_type || '').replace(/_/g, ' ')}
                     </span>
-                    <p className="text-[10px] text-slate-400 mt-2 font-mono">Status: {viewReport.is_finalized ? 'FINALIZED' : 'DRAFT'}</p>
+                    <p className="text-[10px] text-slate-500 mt-2 font-mono font-semibold">Status: {viewReport.is_finalized ? 'FINALIZED' : 'DRAFT'}</p>
                   </div>
                 </div>
               </div>
@@ -311,31 +292,31 @@ export default function ReportsPage() {
               {/* Metadata Grid */}
               <div className="grid grid-cols-2 gap-x-8 gap-y-4 text-xs bg-slate-50 p-4 rounded-xl border border-slate-200 mb-6 font-mono">
                 <div>
-                  <span className="text-[9px] text-slate-400 block uppercase tracking-wider font-semibold">Report ID</span>
-                  <span className="font-semibold text-slate-700">{viewReport.id}</span>
+                  <span className="text-[9px] text-slate-500 block uppercase tracking-wider font-semibold">Report ID</span>
+                  <span className="font-semibold text-slate-900">{viewReport.id}</span>
                 </div>
                 <div>
-                  <span className="text-[9px] text-slate-400 block uppercase tracking-wider font-semibold">Case ID</span>
-                  <span className="font-semibold text-slate-700">{viewReport.case_id || '—'}</span>
+                  <span className="text-[9px] text-slate-500 block uppercase tracking-wider font-semibold">Case ID</span>
+                  <span className="font-semibold text-slate-900">{viewReport.case_id || '—'}</span>
                 </div>
                 <div>
-                  <span className="text-[9px] text-slate-400 block uppercase tracking-wider font-semibold">Generated Date & Time</span>
-                  <span className="font-semibold text-slate-700">{formatDateTime(viewReport.created_at)}</span>
+                  <span className="text-[9px] text-slate-500 block uppercase tracking-wider font-semibold">Generated Date & Time</span>
+                  <span className="font-semibold text-slate-900">{formatDateTime(viewReport.created_at)}</span>
                 </div>
                 <div>
-                  <span className="text-[9px] text-slate-400 block uppercase tracking-wider font-semibold">Officer Name</span>
-                  <span className="font-semibold text-slate-700">{viewReport.created_by_name || 'System Generated'}</span>
+                  <span className="text-[9px] text-slate-500 block uppercase tracking-wider font-semibold">Officer Name</span>
+                  <span className="font-semibold text-slate-900">{viewReport.created_by_name || 'System Generated'}</span>
                 </div>
               </div>
 
               {/* Report Body */}
-              <div className="space-y-6 text-xs text-slate-700">
+              <div className="space-y-6 text-xs text-slate-800">
                 {/* 1. Case Summary */}
                 <div>
                   <h3 className="text-sm font-bold text-slate-900 border-b border-slate-200 pb-1 mb-2">
                     1. Executive Case Summary
                   </h3>
-                  <p className="whitespace-pre-wrap leading-relaxed">
+                  <p className="whitespace-pre-wrap leading-relaxed font-medium">
                     {viewReport.content?.case_summary || viewReport.summary || 'No summary details generated.'}
                   </p>
                 </div>
@@ -346,13 +327,13 @@ export default function ReportsPage() {
                     2. Applicable BNS / IPC Sections
                   </h3>
                   {viewReport.content?.applicable_bns_sections?.length > 0 ? (
-                    <ul className="list-disc pl-5 space-y-1">
+                    <ul className="list-disc pl-5 space-y-1 font-medium">
                       {viewReport.content.applicable_bns_sections.map((sec, i) => (
                         <li key={i}>{sec}</li>
                       ))}
                     </ul>
                   ) : (
-                    <p className="italic text-slate-400 text-[11px]">No BNS sections specified in this report.</p>
+                    <p className="italic text-slate-500 text-[11px]">No BNS sections specified in this report.</p>
                   )}
                 </div>
 
@@ -362,13 +343,13 @@ export default function ReportsPage() {
                     3. Recommended Investigation Procedure
                   </h3>
                   {viewReport.content?.investigation_procedure?.length > 0 ? (
-                    <ol className="list-decimal pl-5 space-y-1.5">
+                    <ol className="list-decimal pl-5 space-y-1.5 font-medium">
                       {viewReport.content.investigation_procedure.map((step, i) => (
                         <li key={i} className="pl-1">{step}</li>
                       ))}
                     </ol>
                   ) : (
-                    <p className="italic text-slate-400 text-[11px]">No investigation procedure steps specified.</p>
+                    <p className="italic text-slate-500 text-[11px]">No investigation procedure steps specified.</p>
                   )}
                 </div>
 
@@ -378,16 +359,16 @@ export default function ReportsPage() {
                     4. Required Evidence Checklist
                   </h3>
                   {viewReport.content?.required_evidence?.length > 0 ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2 font-medium">
                       {viewReport.content.required_evidence.map((ev, i) => (
                         <div key={i} className="flex items-center gap-2">
-                          <span className="inline-block w-3.5 h-3.5 border border-slate-300 rounded flex-shrink-0"></span>
+                          <span className="inline-block w-3.5 h-3.5 border border-slate-400 rounded flex-shrink-0"></span>
                           <span>{ev}</span>
                         </div>
                       ))}
                     </div>
                   ) : (
-                    <p className="italic text-slate-400 text-[11px]">No required evidence items specified.</p>
+                    <p className="italic text-slate-500 text-[11px]">No required evidence items specified.</p>
                   )}
                 </div>
 
@@ -397,26 +378,26 @@ export default function ReportsPage() {
                     5. Legal Precautions & Safeguards
                   </h3>
                   {viewReport.content?.legal_precautions?.length > 0 ? (
-                    <ul className="list-disc pl-5 space-y-1 text-red-800">
+                    <ul className="list-disc pl-5 space-y-1 text-red-900 font-semibold">
                       {viewReport.content.legal_precautions.map((p, i) => (
                         <li key={i}>⚠ {p}</li>
                       ))}
                     </ul>
                   ) : (
-                    <p className="italic text-slate-400 text-[11px]">No legal precautions specified.</p>
+                    <p className="italic text-slate-500 text-[11px]">No legal precautions specified.</p>
                   )}
                 </div>
               </div>
 
               {/* Disclaimer */}
               <div className="mt-8 pt-4 border-t border-slate-200 bg-slate-50 p-4 rounded-xl text-center font-sans">
-                <p className="text-[9px] text-slate-400 italic">
+                <p className="text-[9px] text-slate-500 italic">
                   Disclaimer: This report is generated by an artificial intelligence system for investigation support purposes. All findings, legal recommendations, and procedures must be verified by a qualified human officer before taking official action.
                 </p>
               </div>
 
               {/* Footer */}
-              <div className="mt-8 flex justify-between items-center text-[9px] text-slate-400 font-mono">
+              <div className="mt-8 flex justify-between items-center text-[9px] text-slate-500 font-mono font-semibold">
                 <span>System Timestamp: {new Date(viewReport.created_at).toLocaleString('en-IN')}</span>
                 <span>Page 1 of 1</span>
               </div>
@@ -428,7 +409,7 @@ export default function ReportsPage() {
       {/* Delete Confirmation Modal */}
       <Modal open={!!deleteConfirmId} onClose={() => setDeleteConfirmId(null)} title="Delete Report?" size="sm">
         <div className="space-y-4">
-          <p className="text-sm text-slate-400 font-medium">
+          <p className="text-sm text-slate-700 dark:text-slate-300 font-medium">
             Are you sure you want to delete this report? This action cannot be undone.
           </p>
           <div className="flex justify-end gap-3 pt-2">
