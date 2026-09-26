@@ -50,7 +50,8 @@ class Settings(BaseSettings):
     LOG_FILE: str = "./logs/app.log"
 
     # CORS
-    ALLOWED_ORIGINS: str = "http://localhost:3000,http://localhost:5173"
+    # ALLOWED_ORIGINS: str = "http://localhost:3000,http://localhost:5173"
+    ALLOWED_ORIGINS: str = "http://localhost:3000,http://localhost:5173,https://ai-investigation-frontend.onrender.com"
 
     # Admin
     ADMIN_EMAIL: str = "admin@investigation.gov"
