@@ -1,6 +1,6 @@
 export default function Card({ children, className = '', glow = false }) {
   return (
-    <div className={`rounded-2xl p-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 shadow-sm transition-colors ${className}`}>
+    <div className={`rounded-2xl p-6 bg-white dark:bg-[#0F172A] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white shadow-sm transition-colors ${className}`}>
       {children}
     </div>
   );

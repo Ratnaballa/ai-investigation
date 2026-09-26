@@ -39,19 +39,19 @@
 html.dark {
   color-scheme: dark;
 
-  /* Global Theme CSS Tokens - Dark Mode */
-  --bg-app: #090d16;
-  --bg-surface: #111827;
-  --bg-surface-hover: #1f2937;
-  --bg-subtle: #1e293b;
-  --border-color: #1e293b;
-  --border-strong: #334155;
-  --text-primary: #f8fafc;
-  --text-secondary: #cbd5e1;
-  --text-muted: #94a3b8;
-  --accent-blue: #3b82f6;
-  --accent-blue-hover: #60a5fa;
-  --card-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.5);
+  /* Global Theme CSS Tokens - Cyber Dark Investigation Mode */
+  --bg-app: #020817;
+  --bg-surface: #0F172A;
+  --bg-surface-hover: #1e293b;
+  --bg-subtle: #111827;
+  --border-color: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.15);
+  --text-primary: #ffffff;
+  --text-secondary: #94A3B8;
+  --text-muted: #64748b;
+  --accent-blue: #38bdf8;
+  --accent-blue-hover: #0ea5e9;
+  --card-shadow: 0 4px 24px -2px rgba(0, 0, 0, 0.6);
 }
 
 * {
@@ -82,11 +82,11 @@ html:not(.dark) body {
 
 /* Dark Mode Body Styling */
 html.dark body {
-  color: #f8fafc;
-  background-color: #090d16;
+  color: #ffffff;
+  background-color: #020817;
 }
 
-/* Overrides for Legacy Glass / Translucent Utility Classes -> Make Crisp & High Contrast */
+/* Glass / Card Styling */
 .glass,
 .glass-dark,
 .premium-card {
@@ -100,8 +100,6 @@ html:not(.dark) .glass,
 html:not(.dark) .glass-dark,
 html:not(.dark) .premium-card {
   background-color: #ffffff !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
   border: 1px solid #e2e8f0 !important;
   box-shadow: 0 1px 3px 0 rgba(15, 23, 42, 0.06) !important;
   color: #0f172a !important;
@@ -110,12 +108,10 @@ html:not(.dark) .premium-card {
 html.dark .glass,
 html.dark .glass-dark,
 html.dark .premium-card {
-  background-color: #111827 !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-  border: 1px solid #1e293b !important;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important;
-  color: #f8fafc !important;
+  background-color: #0F172A !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5) !important;
+  color: #ffffff !important;
 }
 
 /* Input Fields Utility */
@@ -127,14 +123,14 @@ html:not(.dark) .input-glass {
 }
 
 html.dark .input-glass {
-  background-color: #1e293b !important;
-  border: 1px solid #334155 !important;
-  color: #f8fafc !important;
+  background-color: #111827 !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  color: #ffffff !important;
 }
 
 /* Text Selection */
 ::selection {
-  background: rgba(37, 99, 235, 0.3);
+  background: rgba(56, 189, 248, 0.3);
   color: inherit;
 }
 
@@ -150,7 +146,7 @@ html:not(.dark) ::-webkit-scrollbar-track {
 }
 
 html.dark ::-webkit-scrollbar-track {
-  background: #0f172a;
+  background: #020817;
 }
 
 html.light ::-webkit-scrollbar-thumb,
@@ -160,17 +156,17 @@ html:not(.dark) ::-webkit-scrollbar-thumb {
 }
 
 html.dark ::-webkit-scrollbar-thumb {
-  background: #334155;
+  background: #1e293b;
   border-radius: 999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #3b82f6;
+  background: #38bdf8;
 }
 
 /* Gradient & Accent Utility Classes */
 .text-gradient {
-  background: linear-gradient(135deg, #2563eb, #0284c7 60%, #7c3aed);
+  background: linear-gradient(135deg, #38bdf8, #0284c7 60%, #818cf8);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;

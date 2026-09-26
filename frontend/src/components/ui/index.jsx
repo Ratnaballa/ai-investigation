@@ -10,7 +10,7 @@ export function Badge({ children, className = '' }) {
 export function Spinner({ size = 'md' }) {
   const s = { sm: 'h-4 w-4', md: 'h-8 w-8', lg: 'h-12 w-12' }[size];
   return (
-    <svg className={`animate-spin ${s} text-blue-600 dark:text-blue-400`} fill="none" viewBox="0 0 24 24">
+    <svg className={`animate-spin ${s} text-blue-600 dark:text-cyan-400`} fill="none" viewBox="0 0 24 24">
       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
     </svg>
@@ -26,21 +26,21 @@ export function Modal({ open, onClose, title, children, size = 'md' }) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 dark:bg-slate-950/85"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 dark:bg-black/80 backdrop-blur-sm"
           onClick={onClose}
         >
           <motion.div
             initial={{ scale: 0.95, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.95, opacity: 0 }}
-            className={`w-full ${widths[size]} max-h-[90vh] overflow-y-auto rounded-[24px] border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 shadow-2xl transition-colors`}
+            className={`w-full ${widths[size]} max-h-[90vh] overflow-y-auto rounded-[24px] border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0F172A] text-slate-900 dark:text-white shadow-2xl transition-colors`}
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 p-6">
+            <div className="flex items-center justify-between border-b border-slate-200 dark:border-white/10 p-6">
               <h2 className="text-lg font-bold text-slate-900 dark:text-white">{title}</h2>
               <button
                 onClick={onClose}
-                className="rounded-xl p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+                className="rounded-xl p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#111827] transition"
               >
                 <MdClose size={20} />
               </button>
@@ -65,10 +65,10 @@ export function Select({ label, value, onChange, options = [], className = '', r
         value={value}
         onChange={onChange}
         required={required}
-        className="cursor-pointer rounded-2xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950/80 px-4 py-2.5 text-sm text-slate-900 dark:text-slate-100 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+        className="cursor-pointer rounded-2xl border border-slate-300 dark:border-white/10 bg-white dark:bg-[#111827] px-4 py-2.5 text-sm text-slate-900 dark:text-white outline-none transition focus:border-blue-500 dark:focus:border-cyan-400"
       >
         {options.map((o) => (
-          <option key={o.value} value={o.value} className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100">
+          <option key={o.value} value={o.value} className="bg-white dark:bg-[#0F172A] text-slate-900 dark:text-white">
             {o.label}
           </option>
         ))}
@@ -91,7 +91,7 @@ export function Textarea({ label, value, onChange, placeholder, rows = 4, classN
         placeholder={placeholder}
         rows={rows}
         required={required}
-        className="resize-none rounded-2xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950/80 px-4 py-2.5 text-sm text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+        className="resize-none rounded-2xl border border-slate-300 dark:border-white/10 bg-white dark:bg-[#111827] px-4 py-2.5 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-[#94A3B8] outline-none transition focus:border-blue-500 dark:focus:border-cyan-400"
       />
     </div>
   );
@@ -100,11 +100,11 @@ export function Textarea({ label, value, onChange, placeholder, rows = 4, classN
 export function EmptyState({ icon, title, description, action }) {
   return (
     <div className="flex flex-col items-center justify-center py-16 text-center">
-      <div className="mb-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900 p-4 text-5xl text-slate-400 dark:text-slate-500">
+      <div className="mb-4 rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-[#111827] p-4 text-5xl text-slate-400 dark:text-[#94A3B8]">
         {icon}
       </div>
-      <h3 className="mb-2 text-lg font-bold text-slate-900 dark:text-slate-100">{title}</h3>
-      {description && <p className="mb-6 max-w-sm text-sm text-slate-600 dark:text-slate-400">{description}</p>}
+      <h3 className="mb-2 text-lg font-bold text-slate-900 dark:text-white">{title}</h3>
+      {description && <p className="mb-6 max-w-sm text-sm text-slate-600 dark:text-[#94A3B8]">{description}</p>}
       {action}
     </div>
   );
@@ -115,7 +115,7 @@ export function PageLoader() {
     <div className="flex items-center justify-center h-64">
       <div className="flex flex-col items-center gap-4">
         <Spinner size="lg" />
-        <p className="text-slate-600 dark:text-slate-400 text-sm font-medium">Loading...</p>
+        <p className="text-slate-600 dark:text-[#94A3B8] text-sm font-medium">Loading...</p>
       </div>
     </div>
   );
